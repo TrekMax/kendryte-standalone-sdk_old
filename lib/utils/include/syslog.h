@@ -63,7 +63,7 @@ typedef enum _kendryte_log_level
 #endif /* CONFIG_LOG_COLORS */
 /* clang-format on */
 
-#define LOG_FORMAT(letter, format) LOG_COLOR_##letter #letter " (%lu) %s: " format LOG_RESET_COLOR "\n"
+#define LOG_FORMAT(letter, format) LOG_COLOR_##letter #letter " (%lu) %s: " format LOG_RESET_COLOR "\r\n"
 
 #ifdef LOG_LEVEL
 #undef CONFIG_LOG_LEVEL
