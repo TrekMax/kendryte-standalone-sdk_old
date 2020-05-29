@@ -390,7 +390,12 @@ $RECYCLE.BIN/
 # gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
 
 ## Build generated
-build/
+build\
+!build\hello_world\build.sh
+!build\hello_world\clear.sh
+!build\hello_world\flash.sh
+!build\hello_world\*.bin
+
 DerivedData/
 
 ## Various settings
@@ -806,12 +811,3 @@ ASALocalRun/
 # End of https://www.gitignore.io/api/visualstudiocode,windows,c,c++,cmake,codeblocks,intellij+all,jetbrains+all,kdevelop4,linux,macos,osx,pycharm+all,vim,visualstudio,xcode
 
 # Custom rules (everything added below won't be overriden by 'Generate .gitignore File' if you use 'Update' option)
-
-kendryte-standlone-sdk.si4project/
-
-kendryte-standalone-demo
-kendryte-standalone-demo-bak
-src/
-!src/hello_world
-/CMakeSettings.json
-/build_i
