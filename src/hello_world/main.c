@@ -14,28 +14,44 @@
  */
 #include <bsp.h>
 #include <sysctl.h>
+#include "syslog.h"
+#include "board_config.h"
+
+static const char *TAG = "main";
 
 int core1_function(void *ctx)
 {
     uint64_t core = current_coreid();
-    printf("Core %ld Hello world\n", core);
+    LOGI(TAG, "Core %ld Hello world", core);
     while(1);
 }
 
 int main(void)
 {
-    sysctl_pll_set_freq(SYSCTL_PLL0, 800000000);
+    uint32_t freq = 0;
+    freq = sysctl_pll_set_freq(SYSCTL_PLL0, 800000000);
     uint64_t core = current_coreid();
     int data;
-    printf("Core %ld Hello world\n", core);
+    printk(LOG_COLOR_W "-------------------------------\r\n");
+    printk(LOG_COLOR_W "Sipeed@QinYUN575\r\n");
+    printk(LOG_COLOR_W "Compile@ %s %s\r\n", __DATE__, __TIME__);
+    printk(LOG_COLOR_W "Board: " LOG_COLOR_E BOARD_NAME "\r\n");
+    printk(LOG_COLOR_W "pll freq: %dhz\r\n", freq);
+    printk(LOG_COLOR_W "-------------------------------\r\n");
+
+    LOGI(TAG, "Core %ld Hello world", core);
     register_core1(core1_function, NULL);
 
     /* Clear stdin buffer before scanf */
     sys_stdin_flush();
 
     scanf("%d", &data);
-    printf("\nData is %d\n", data);
+    LOGI(TAG, "\r\nData is %d", data);
+    printk(LOG_COLOR_W "-------------END---------------\r\n");
     while(1)
-        continue;
+    {
+         LOGI(TAG, "Hello K210!");
+         msleep(1000);
+    }
     return 0;
 }
