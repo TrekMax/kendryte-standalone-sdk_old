@@ -55,7 +55,7 @@ void lcd_init(void)
 
 void lcd_set_direction(lcd_dir_t dir)
 {
-#if !BOARD_MAIX_DUINO
+#if (BOARD != BOARD_MAIX_DUINO)
     dir |= 0x08;
 #endif
     lcd_ctl.dir = dir;

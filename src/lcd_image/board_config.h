@@ -10,8 +10,8 @@
 #define BOARD_MAIX_GO       5
 #define BOARD_MAIX_NEW_GO   6
 
-#define BOARD   BOARD_MAIX_DUINO
-#define BOARD_NAME "BOARD_MAIX_DUINO"
+#define BOARD   BOARD_MAIX_NEW_GO
+#define BOARD_NAME "BOARD_MAIX_NEW_GO"
 
 #if ((BOARD == BOARD_MAIX_DUINO) || (BOARD == BOARD_MAIX_NEW_GO))
 
@@ -32,5 +32,20 @@
 
 #endif
 
+/******************************************************************************/
+
+#if (BOARD == BOARD_MAIX_DUINO)
+
+#define LCD_X_MAX   (240)
+#define LCD_Y_MAX   (320)
+
+#elif  (BOARD == BOARD_MAIX_NEW_GO)
+
+#define LCD_X_MAX   (320)
+#define LCD_Y_MAX   (480)
+
+#else
+
+#endif
 
 #endif

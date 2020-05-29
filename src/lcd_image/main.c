@@ -62,7 +62,7 @@ int main(void)
     io_set_power();
     lcd_init();
 
-#if BOARD_MAIX_DUINO
+#if (BOARD == BOARD_MAIX_DUINO)
     lcd_set_direction(DIR_YX_RLDU);     /* left up 0,0 */
 #else
     lcd_set_direction(DIR_YX_RLUD);     /* left up 0,0 */
