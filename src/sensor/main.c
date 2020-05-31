@@ -28,6 +28,7 @@
 #include "lcd.h"
 #include "ov5640.h"
 #include "ov2640.h"
+#include "gc0328.h"
 
 #include "board_config.h"
 
@@ -124,7 +125,16 @@ void dvp_sensor_init(void)
 
     dvp_set_image_size(320, 240);
     ov2640_init();
+    #elif (CAMERA == CAMERA_GC0328)
+    dvp_init(8);
+    dvp_set_xclk_rate(24000000);
+    dvp_enable_burst();
+    dvp_set_output_enable(0, 1);
+    dvp_set_output_enable(1, 1);
+    dvp_set_image_format(DVP_CFG_RGB_FORMAT);
 
+    dvp_set_image_size(320, 240);
+    gc0328_init();
     #else
         LOGE(TAG, "Undefined camera model!");
         return;

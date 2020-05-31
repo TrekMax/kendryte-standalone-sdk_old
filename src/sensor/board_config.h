@@ -27,7 +27,7 @@
 #define CAMERA_GC0328   4
 #define CAMERA_GC2145   5
 
-#define CAMERA  CAMERA_OV2640
+#define CAMERA  CAMERA_GC0328
 
 /******************************************************************************/
 
