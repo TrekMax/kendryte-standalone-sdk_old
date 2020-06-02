@@ -22,13 +22,14 @@
 #include "sysctl.h"
 #include "uarths.h"
 #include "iomem.h"
-
+#include "sleep.h"
 #include "syslog.h"
 
 #include "lcd.h"
 #include "ov5640.h"
 #include "ov2640.h"
 #include "gc0328.h"
+#include "gc2145.h"
 
 #include "board_config.h"
 
@@ -92,8 +93,6 @@ static void io_set_power(void)
 void dvp_sensor_init(void)
 {
 
-    g_lcd_gram0 = (uint32_t *)iomem_malloc(320*240*2);
-    g_lcd_gram1 = (uint32_t *)iomem_malloc(320*240*2);
     /* DVP init */
     LOGI(TAG, "DVP init");
 #if (CAMERA == CAMERA_OV5640)
@@ -135,6 +134,17 @@ void dvp_sensor_init(void)
 
     dvp_set_image_size(320, 240);
     gc0328_init();
+    #elif (CAMERA == CAMERA_GC2145)
+    dvp_init(8);
+    dvp_set_xclk_rate(24000000);
+    dvp_enable_burst();
+    dvp_set_output_enable(0, 1);
+    dvp_set_output_enable(1, 1);
+    dvp_set_image_format(DVP_CFG_RGB_FORMAT);
+
+    dvp_set_image_size(320, 240);
+    // dvp_set_image_size(640, 480);
+    gc2145_init();
     #else
         LOGE(TAG, "Undefined camera model!");
         return;
@@ -175,6 +185,26 @@ void dvp_sensor_init(void)
     iomem_free(g_lcd_gram1);
 }
 
+
+
+extern const unsigned char gImage_image[] __attribute__((aligned(128)));
+
+static uint16_t lcd_gram[320 * 240] __attribute__((aligned(32)));
+void rgb888_to_lcd(uint8_t* src, uint16_t* dest, size_t width, size_t height)
+{
+    size_t chn_size = width * height;
+    for (size_t i = 0; i < width * height; i++) {
+        uint8_t r = src[i];
+        uint8_t g = src[chn_size + i];
+        uint8_t b = src[chn_size * 2 + i];
+
+        uint16_t rgb = ((r & 0b11111000) << 8) | ((g & 0b11111100) << 3) | (b >> 3);
+        size_t d_i = i % 2 ? (i - 1) : (i + 1);
+        dest[d_i] = rgb;
+    }
+}
+
+
 int main(void)
 {
     uint32_t freq_ppl0 = 0;
@@ -208,6 +238,14 @@ int main(void)
 
     lcd_clear(BLACK);
 
+
+    g_lcd_gram0 = (uint32_t *)iomem_malloc(320*240*2);
+    g_lcd_gram1 = (uint32_t *)iomem_malloc(320*240*2);
+
+    // LCD Display Test
+    // rgb888_to_lcd(gImage_image, lcd_gram, 320, 240);
+    // lcd_draw_picture(0, 0, 320, 240, lcd_gram);
+    // msleep(1000);
     dvp_sensor_init();
 
     printk(LOG_COLOR_W "-------------END---------------\r\n");
