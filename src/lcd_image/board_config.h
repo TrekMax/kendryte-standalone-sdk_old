@@ -13,7 +13,7 @@
 #define BOARD   BOARD_MAIX_NEW_GO
 #define BOARD_NAME "BOARD_MAIX_NEW_GO"
 
-#if ((BOARD == BOARD_MAIX_DUINO) || (BOARD == BOARD_MAIX_NEW_GO))
+#if ((BOARD == BOARD_MAIX_DUINO) || (BOARD == BOARD_MAIX_NEW_GO) || (BOARD == BOARD_MAIX_CUBE))
 
 #define DCX_GPIO_HS_NUM        (2)
 #define RST_GPIO_HS_NUM        (30)
@@ -26,7 +26,7 @@
 #define SPI_CHANNEL             0
 #define SPI_SLAVE_SELECT        3
 
-#elif (BOARD == BOARD_MAIX_CUBE)
+#elif (BOARD == BOARD_MAIX_GO)
 
 #else
 
@@ -39,10 +39,26 @@
 #define LCD_X_MAX   (240)
 #define LCD_Y_MAX   (320)
 
+#define LCD_BL_CONTROL  1
+#define LCD_BL_GPIONUM 17
+#define LCD_BL_GPION_FUN FUNC_GPIOHS17
+
 #elif  (BOARD == BOARD_MAIX_NEW_GO)
 
 #define LCD_X_MAX   (320)
 #define LCD_Y_MAX   (480)
+
+#elif  (BOARD == BOARD_MAIX_CUBE)
+
+// #define LCD_X_MAX   (240)
+// #define LCD_Y_MAX   (240)
+#define LCD_X_MAX   (240)
+#define LCD_Y_MAX   (320)
+
+#define LCD_BL_CONTROL  1
+#define LCD_BL_GPIONUM 17
+#define LCD_BL_GPION_FUN FUNC_GPIOHS17
+
 
 #else
 
