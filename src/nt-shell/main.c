@@ -14,16 +14,16 @@
  */
 #include <bsp.h>
 #include <sysctl.h>
+
 #include "board_config.h"
+
 #include "syslog.h"
 #include "uart.h"
+#include "ntlibc.h"
+#include "ntshell.h"
 
 static const char *TAG = "main";
 
-// #include "chip.h"
-#include "ntlibc.h"
-#include "ntshell.h"
-// #include "uart.h"
 
 #define UNUSED_VARIABLE(N) \
     do                     \
