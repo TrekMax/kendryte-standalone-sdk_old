@@ -69,16 +69,13 @@ int gc2145_read_id(uint8_t num, uint16_t *id)
 }
 
 #define sensor_default_regs gc2145_sensor_default_regs
-// #define sensor_default_regs init_gc2145
-// #define sensor_default_regs qvga_gc2145
-// #define sensor_default_regs vga_gc2145
 
 int gc2145_init(void)
 {
     uint32_t i;
 
     uint8_t num = 0, data;
-    uint16_t sensor_id;
+    uint16_t sensor_id; 
  
     gc2145_i2c_master_init(num);
     gc2145_read_id(num, &sensor_id);
@@ -94,11 +91,6 @@ int gc2145_init(void)
         //     printf("\r\n%5d:  ", (i/10));
         // }
         // printf("%02X  ", data);
-    }
-    // printf("\r\n-----------------------\r\n");
-    for (i=0; qvga_gc2145[i][0]; i++)
-    {
-        gc2145_wr_reg(num, qvga_gc2145[i][0], qvga_gc2145[i][1]);
     }
     return 0;
 }

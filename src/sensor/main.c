@@ -137,10 +137,14 @@ void dvp_sensor_init(void)
     #elif (CAMERA == CAMERA_GC2145)
     dvp_init(8);
     dvp_set_xclk_rate(24000000);
+    // dvp_set_xclk_rate(20000000);
     dvp_enable_burst();
     dvp_set_output_enable(0, 1);
     dvp_set_output_enable(1, 1);
-    dvp_set_image_format(DVP_CFG_RGB_FORMAT);
+    dvp_set_image_format(DVP_CFG_YUV_FORMAT);
+    // dvp_set_image_format(DVP_CFG_Y_FORMAT);
+    
+    // dvp_set_image_format(DVP_CFG_RGB_FORMAT);
 
     dvp_set_image_size(320, 240);
     // dvp_set_image_size(640, 480);

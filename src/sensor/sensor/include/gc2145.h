@@ -17,6 +17,11 @@
 
 #include <stdint.h>
 
+/**
+ * GC2145 Device Address:
+ * serial bus write address = 0x78, serial bus read address = 0x79
+ * 
+ */
 #define GC2145_ADDR 0x78
 
 int gc2145_init(void);
