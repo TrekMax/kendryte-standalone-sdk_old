@@ -17,6 +17,7 @@
 #include "lcd.h"
 #include "nt35310.h"
 #include "font.h"
+#include "sleep.h"
 #include "board_config.h"
 
 static lcd_ctl_t lcd_ctl;
@@ -31,6 +32,11 @@ void lcd_interrupt_enable(void)
     lcd_ctl.mode = 1;
 }
 
+void tft_write_onebyte(uint8_t data)
+{
+    tft_write_byte(&data, 1);
+}
+
 void lcd_init(void)
 {
     uint8_t data = 0;
@@ -39,6 +45,58 @@ void lcd_init(void)
     /*soft reset*/
     tft_write_command(SOFTWARE_RESET);
     usleep(100000);
+
+#if (BOARD == BOARD_MAIX_NEW_GO)
+
+    tft_write_command(0XF8);//
+    tft_write_onebyte(0x21);
+    tft_write_onebyte(0x04);
+    
+    tft_write_command(0XF9);//
+    tft_write_onebyte(0x00);
+    tft_write_onebyte(0x08);
+
+    tft_write_command(0x36);//
+    tft_write_onebyte(0x08);
+
+    tft_write_command(0xE0);//
+    tft_write_onebyte(0x0F);
+    tft_write_onebyte(0x1F);
+    tft_write_onebyte(0x1C);
+    tft_write_onebyte(0x0C);
+    tft_write_onebyte(0x0F);
+    tft_write_onebyte(0x08);
+    tft_write_onebyte(0x48);
+    tft_write_onebyte(0x98);
+    tft_write_onebyte(0x37);
+    tft_write_onebyte(0x0A);
+    tft_write_onebyte(0x13);
+    tft_write_onebyte(0x04);
+    tft_write_onebyte(0x11);
+    tft_write_onebyte(0x0D);
+    tft_write_onebyte(0x00);
+
+    tft_write_command(0xE1);//
+    tft_write_onebyte(0x0F);
+    tft_write_onebyte(0x32);
+    tft_write_onebyte(0x2E);
+    tft_write_onebyte(0x0B);
+    tft_write_onebyte(0x0D);
+    tft_write_onebyte(0x05);
+    tft_write_onebyte(0x47);
+    tft_write_onebyte(0x75);
+    tft_write_onebyte(0x37);
+    tft_write_onebyte(0x06);
+    tft_write_onebyte(0x10);
+    tft_write_onebyte(0x03);
+    tft_write_onebyte(0x24);
+    tft_write_onebyte(0x20);
+    tft_write_onebyte(0x00);
+#endif 
+    /*soft reset*/
+    tft_write_command(SOFTWARE_RESET);
+    usleep(100000);
+
     /*exit sleep*/
     tft_write_command(SLEEP_OFF);
     usleep(100000);
@@ -50,12 +108,12 @@ void lcd_init(void)
 
     /*display on*/
     tft_write_command(DISPALY_ON);
+    
     lcd_polling_enable();
 }
 
 void lcd_set_direction(lcd_dir_t dir)
 {
-
     lcd_ctl.dir = dir;
     if (dir & DIR_XY_MASK)
     {
