@@ -50,120 +50,47 @@ void spi_io_mux_init(void)
 
 int spi_flash_psram_test(void)
 {
-    uint8_t manuf_id, device_id;
-    uint32_t index;
 
     LOGI(TAG, "spi%d master test", SPI_INDEX);
     spi_io_mux_init();
 
     psram_init(SPI_INDEX, SPI_CHIP_SELECT_NSS);
-
-    psram_read_id(&manuf_id, &device_id);
-    LOGI(TAG, "manuf_id:0x%02X, device_id:0x%02X", manuf_id, device_id);
-    if((manuf_id != 0xEF && manuf_id != 0xC8 && manuf_id != 0x0B) || (device_id != 0x17 && device_id != 0x16))
-    {
-        LOGI(TAG, "manuf_id:0x%02X, device_id:0x%02X", manuf_id, device_id);
-        return 0;
+   
+    
+    uint64_t device_id;
+    psram_read_id(&device_id);
+    if (!PSRAM_IS_VALID(device_id)) {
+        LOGE(TAG, "PSRAM_IS_INVALID");
+        return -1;
     }
-
-    /*write data*/
-    for(index = 0; index < TEST_NUMBER; index++)
-        data_buf[index] = (uint8_t)(index);
-    LOGI(TAG, "erase sector");
-    psram_sector_erase(DATA_ADDRESS);
-    while(psram_is_busy() == PSRAM_BUSY)
-        ;
-    LOGI(TAG, "write data");
-    psram_write_data_direct(DATA_ADDRESS, data_buf, TEST_NUMBER);
-
-    /* standard read test*/
-    for(index = 0; index < TEST_NUMBER; index++)
-        data_buf[index] = 0;
-    LOGI(TAG, "standard read test start");
-    psram_read_data(DATA_ADDRESS, data_buf, TEST_NUMBER, PSRAM_STANDARD);
-    for(index = 0; index < TEST_NUMBER; index++)
+    else
     {
-        if(data_buf[index] != (uint8_t)(index))
+        LOGI(TAG, "PSRAM IS VALID!");
+        switch (PSRAM_SIZE_ID(device_id))
         {
-            LOGI(TAG, "standard read test error");
-            return 0;
+        case PSRAM_EID_SIZE_16MBITS://2MB
+            LOGI(TAG, "PSRAM_EID_SIZE_16MBITS");
+            break;
+
+        case PSRAM_EID_SIZE_32MBITS://4MB
+            LOGI(TAG, "PSRAM_EID_SIZE_32MBITS");
+            break;
+
+        case PSRAM_EID_SIZE_64MBITS://8MB
+            LOGI(TAG, "PSRAM_EID_SIZE_64MBITS");
+            break;
+        
+        default:
+            break;
         }
     }
-
-    /*standard fast read test*/
-    for(index = 0; index < TEST_NUMBER; index++)
-        data_buf[index] = 0;
-    LOGI(TAG, "standard fast read test start");
-    /*psram_read_data(0, data_buf, TEST_NUMBER, PSRAM_STANDARD_FAST);*/
-    psram_read_data(DATA_ADDRESS, data_buf, TEST_NUMBER, PSRAM_STANDARD_FAST);
-    for(index = 0; index < TEST_NUMBER; index++)
-    {
-        if(data_buf[index] != (uint8_t)index)
-        {
-            LOGI(TAG, "standard fast read test error");
-            return 0;
-        }
-    }
-
-    /*dual read test*/
-    for(index = 0; index < TEST_NUMBER; index++)
-        data_buf[index] = 0;
-    LOGI(TAG, "dual read test start");
-    psram_read_data(DATA_ADDRESS, data_buf, TEST_NUMBER, PSRAM_DUAL);
-    for(index = 0; index < TEST_NUMBER; index++)
-    {
-        if(data_buf[index] != (uint8_t)index)
-        {
-            LOGI(TAG, "dual read test error");
-            return 0;
-        }
-    }
-
     psram_enable_quad_mode();
-
-    /*quad read test*/
-    for(index = 0; index < TEST_NUMBER; index++)
-        data_buf[index] = 0;
-    LOGI(TAG, "quad read test start");
-    psram_read_data(DATA_ADDRESS, data_buf, TEST_NUMBER, PSRAM_QUAD);
-    for(index = 0; index < TEST_NUMBER; index++)
-    {
-        if(data_buf[index] != (uint8_t)(index))
-        {
-            LOGI(TAG, "quad read test error");
-            return 0;
-        }
+    psram_read_id(&device_id);
+    if (!PSRAM_IS_VALID(device_id)) {
+        LOGE(TAG, "PSRAM_IS_INVALID");
+        return -1;
     }
-
-    /*dual fast read test*/
-    for(index = 0; index < TEST_NUMBER; index++)
-        data_buf[index] = 0;
-    LOGI(TAG, "dual fast read test start");
-    psram_read_data(DATA_ADDRESS, data_buf, TEST_NUMBER, PSRAM_DUAL_FAST);
-    for(index = 0; index < TEST_NUMBER; index++)
-    {
-        if(data_buf[index] != (uint8_t)index)
-        {
-            LOGI(TAG, "dual fast read test error");
-            return 0;
-        }
-    }
-
-    /*quad fast read test*/
-    for(index = 0; index < TEST_NUMBER; index++)
-        data_buf[index] = 0;
-    LOGI(TAG, "quad fast read test start");
-    psram_read_data(DATA_ADDRESS, data_buf, TEST_NUMBER, PSRAM_QUAD_FAST);
-    for(index = 0; index < TEST_NUMBER; index++)
-    {
-        if(data_buf[index] != (uint8_t)(index))
-        {
-            LOGI(TAG, "quad fast read test error");
-            return 0;
-        }
-    }
-
-    LOGI(TAG, "spi%d master test ok", SPI_INDEX);
+    
 }
 
 int main(void)
@@ -178,10 +105,7 @@ int main(void)
     printk(LOG_COLOR_W "Board: " LOG_COLOR_E BOARD_NAME "\r\n");
     printk(LOG_COLOR_W "pll freq: %dhz\r\n", freq);
     printk(LOG_COLOR_W "-------------------------------\r\n");
-
-    // LOGI(TAG, "Core %ld Hello world", core);
-    // register_core1(core1_function, NULL);
-
+    
     spi_flash_psram_test();
 
     printk(LOG_COLOR_W "-------------END---------------\r\n");

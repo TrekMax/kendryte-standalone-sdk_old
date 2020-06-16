@@ -22,43 +22,57 @@
 
 #define SPI_SLAVE_SELECT                    (0x01)
 
-#define psram_FLASH_PAGE_SIZE              256
-#define psram_FLASH_SECTOR_SIZE            4096
-#define psram_FLASH_PAGE_NUM_PER_SECTOR    16
-#define psram_FLASH_CHIP_SIZE              (16777216 UL)
+//Commands for PSRAM chip
+#define PSRAM_READ                 0x03
+#define PSRAM_FAST_READ            0x0B
+#define PSRAM_FAST_READ_DUMMY      0x3
+#define PSRAM_FAST_READ_QUAD       0xEB
+#define PSRAM_FAST_READ_QUAD_DUMMY 0x5
+#define PSRAM_WRITE                0x02
+#define PSRAM_QUAD_WRITE           0x38
+#define PSRAM_ENTER_QMODE          0x35
+#define PSRAM_EXIT_QMODE           0xF5
+#define PSRAM_RESET_EN             0x66
+#define PSRAM_RESET                0x99
+#define PSRAM_SET_BURST_LEN        0xC0
+#define PSRAM_DEVICE_ID            0x9F
 
-#define WRITE_ENABLE                        0x06
-#define WRITE_DISABLE                       0x04
-#define READ_REG1                           0x05
-#define READ_REG2                           0x35
-#define READ_REG3                           0x15
-#define WRITE_REG1                          0x01
-#define WRITE_REG2                          0x31
-#define WRITE_REG3                          0x11
-#define READ_DATA                           0x03
-#define FAST_READ                           0x0B
-#define FAST_READ_DUAL_OUTPUT               0x3B
-#define FAST_READ_QUAL_OUTPUT               0x6B
-#define FAST_READ_DUAL_IO                   0xBB
-#define FAST_READ_QUAL_IO                   0xEB
-#define DUAL_READ_RESET                     0xFFFF
-#define QUAL_READ_RESET                     0xFF
-#define PAGE_PROGRAM                        0x02
-#define QUAD_PAGE_PROGRAM                   0x32
-#define SECTOR_ERASE                        0x20
-#define BLOCK_32K_ERASE                     0x52
-#define BLOCK_64K_ERASE                     0xD8
-#define CHIP_ERASE                          0x60
-#define READ_ID                             0x90
-#define ENABLE_QPI                          0x38
-#define EXIT_QPI                            0xFF
-#define ENABLE_RESET                        0x66
-#define RESET_DEVICE                        0x99
+typedef enum {
+    PSRAM_CLK_MODE_NORM = 0,    /*!< Normal SPI mode */
+    PSRAM_CLK_MODE_DCLK = 1,    /*!< Two extra clock cycles after CS is set high level */
+} psram_clk_mode_t;
 
-#define REG1_BUSY_MASK                      0x01
-#define REG2_QUAL_MASK                      0x02
+#define PSRAM_ID_KGD_M          0xff
+#define PSRAM_ID_KGD_S             8
+#define PSRAM_ID_KGD            0x5d
+#define PSRAM_ID_EID_M          0xff
+#define PSRAM_ID_EID_S            16
 
-#define LETOBE(x)     ((x >> 24) | ((x & 0x00FF0000) >> 8) | ((x & 0x0000FF00) << 8) | (x << 24))
+// Use the [7:5](bit7~bit5) of EID to distinguish the psram size:
+//
+//   BIT7  |  BIT6  |  BIT5  |  SIZE(MBIT)
+//   -------------------------------------
+//    0    |   0    |   0    |     16
+//    0    |   0    |   1    |     32
+//    0    |   1    |   0    |     64
+#define PSRAM_EID_SIZE_M         0x07
+#define PSRAM_EID_SIZE_S            5
+
+typedef enum {
+    PSRAM_EID_SIZE_16MBITS = 0,
+    PSRAM_EID_SIZE_32MBITS = 1,
+    PSRAM_EID_SIZE_64MBITS = 2,
+} psram_eid_size_t;
+
+#define PSRAM_KGD(id)         (((id) >> PSRAM_ID_KGD_S) & PSRAM_ID_KGD_M)
+#define PSRAM_EID(id)         (((id) >> PSRAM_ID_EID_S) & PSRAM_ID_EID_M)
+#define PSRAM_SIZE_ID(id)     ((PSRAM_EID(id) >> PSRAM_EID_SIZE_S) & PSRAM_EID_SIZE_M)
+#define PSRAM_IS_VALID(id)    (PSRAM_KGD(id) == PSRAM_ID_KGD)
+
+// For the old version 32Mbit psram, using the spicial driver */
+#define PSRAM_IS_32MBIT_VER0(id)  (PSRAM_EID(id) == 0x20)
+#define PSRAM_IS_64MBIT_TRIAL(id) (PSRAM_EID(id) == 0x26)
+
 /* clang-format on */
 
 /**
@@ -84,31 +98,24 @@ typedef enum _psram_read
     PSRAM_QUAD_FAST,
 } psram_read_t;
 
+typedef struct {
+    uint16_t cmd;                /*!< Command value */
+    uint16_t cmdBitLen;          /*!< Command byte length*/
+    uint32_t *addr;              /*!< Point to address value*/
+    uint16_t addrBitLen;         /*!< Address byte length*/
+    uint32_t *txData;            /*!< Point to send data buffer*/
+    uint16_t txDataBitLen;       /*!< Send data byte length.*/
+    uint32_t *rxData;            /*!< Point to recevie data buffer*/
+    uint16_t rxDataBitLen;       /*!< Recevie Data byte length.*/
+    uint32_t dummyBitLen;
+} psram_cmd_t;
+
+
 psram_status_t psram_init(uint8_t spi_index, uint8_t spi_ss);
-psram_status_t psram_is_busy(void);
-psram_status_t psram_chip_erase(void);
-psram_status_t psram_enable_quad_mode(void);
-psram_status_t psram_disable_quad_mode(void);
-psram_status_t psram_sector_erase(uint32_t addr);
-psram_status_t psram_32k_block_erase(uint32_t addr);
-psram_status_t psram_64k_block_erase(uint32_t addr);
-psram_status_t psram_read_status_reg1(uint8_t *reg_data);
-psram_status_t psram_read_status_reg2(uint8_t *reg_data);
-psram_status_t psram_write_status_reg(uint8_t reg1_data, uint8_t reg2_data);
-psram_status_t psram_read_id(uint8_t *manuf_id, uint8_t *device_id);
-psram_status_t psram_write_data(uint32_t addr, uint8_t *data_buf, uint32_t length);
-psram_status_t psram_write_data_direct(uint32_t addr, uint8_t *data_buf, uint32_t length);
-psram_status_t psram_read_data(uint32_t addr, uint8_t *data_buf, uint32_t length, psram_read_t mode);
-psram_status_t psram_enable_xip_mode(void);
-psram_status_t psram_disable_xip_mode(void);
-psram_status_t psram_read_id_dma(uint8_t *manuf_id, uint8_t *device_id);
-psram_status_t psram_sector_erase_dma(uint32_t addr);
-psram_status_t psram_init_dma(uint8_t spi_index, uint8_t spi_ss);
-psram_status_t psram_write_data_dma(uint32_t addr, uint8_t *data_buf, uint32_t length);
-psram_status_t psram_write_data_direct_dma(uint32_t addr, uint8_t *data_buf, uint32_t length);
-psram_status_t psram_read_data_dma(uint32_t addr, uint8_t *data_buf, uint32_t length, psram_read_t mode);
-psram_status_t psram_is_busy_dma(void);
-psram_status_t psram_enable_quad_mode_dma(void);
+psram_status_t psram_read_id(uint64_t *device_id);
+
+void psram_disable_quad_mode(void);
+void psram_enable_quad_mode(void);
 
 #endif
 
