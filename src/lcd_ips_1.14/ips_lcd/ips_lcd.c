@@ -4,7 +4,6 @@
 #include "ips_lcd.h"
 #include "sleep.h"
 #include "spi.h"
-#include "pic.h"
 
 #define DATALENGTH 8
 
@@ -192,23 +191,6 @@ void LCD_DrawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t c
 }
 
 /******************************************************************************
-      函数说明：在指定区域填充颜色
-      入口数据：xsta,ysta   起始坐标
-                xend,yend   终止坐标
-								color       要填充的颜色
-      返回值：  无
-******************************************************************************/
-void LCD_Fill(uint16_t xsta, uint16_t ysta, uint16_t xend, uint16_t yend, uint16_t color)
-{
-    uint16_t color1[1];
-    uint16_t num;
-    color1[0] = color;
-    num = (xend - xsta) * (yend - ysta);
-    LCD_Address_Set(xsta, ysta, xend - 1, yend - 1); //设置显示范围
-    gpiohs_set_pin(SPI_IPS_LCD_DC_GPIO_NUM, GPIO_PV_HIGH);
-    spi_fill_data_dma(DMAC_CHANNEL0, SPI_INDEX, SPI_CHIP_SELECT_NSS, color1, num);
-}
-/******************************************************************************
       函数说明：画矩形
       入口数据：x1,y1   起始坐标
                 x2,y2   终止坐标
@@ -231,15 +213,37 @@ void LCD_DrawRectangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint1
                 pic[]  图片数组    
       返回值：  无
 ******************************************************************************/
-void LCD_ShowPicture(uint16_t x,uint16_t y,uint16_t length,uint16_t width,const uint8_t pic[])
+void LCD_ShowPicture(uint16_t x, uint16_t y, uint16_t length, uint16_t width, const uint8_t pic[])
 {
-	uint16_t num;
-	num=length*width*2;
-	LCD_Address_Set(x,y,x+length-1,y+width-1);
-        spi_init(SPI_INDEX, SPI_WORK_MODE_0, SPI_FF_STANDARD, DATALENGTH, 0);
+    uint16_t num;
+    num = length * width * 2;
+    LCD_Address_Set(x, y, x + length - 1, y + width - 1);
+    spi_init(SPI_INDEX, SPI_WORK_MODE_0, SPI_FF_STANDARD, DATALENGTH, 0);
     spi_send_data_standard(SPI_INDEX, SPI_CHIP_SELECT_NSS, NULL, 0, pic, num);
 }
 
+
+/******************************************************************************
+      函数说明：在指定区域填充颜色
+      入口数据：xsta,ysta   起始坐标
+                xend,yend   终止坐标
+                color       要填充的颜色
+      返回值：  无
+******************************************************************************/
+void LCD_Fill(uint16_t x, uint16_t y, uint16_t length, uint16_t width, uint16_t color)
+{
+    gpiohs_set_pin(SPI_IPS_LCD_DC_GPIO_NUM, GPIO_PV_HIGH);
+    uint16_t num;
+    num = length * width * 2;
+    uint32_t data = ((uint32_t)color << 16) | (uint32_t)color;
+    LCD_Address_Set(x, y, x + length - 1, y + width - 1);
+
+    spi_init(SPI_INDEX, SPI_WORK_MODE_0, SPI_FF_STANDARD, 32, 0);
+    spi_init_non_standard(SPI_INDEX, 0/*instrction length*/, 32/*address length*/, 0/*wait cycles*/,
+                          SPI_AITM_AS_FRAME_FORMAT/*spi address trans mode*/);
+    spi_fill_data_dma(DMAC_CHANNEL0, SPI_INDEX, SPI_CHIP_SELECT_NSS, &data, num/2);
+
+}
 /******************************************************/
 
 void ips_lcd_init(void)
@@ -337,16 +341,7 @@ void ips_lcd_init(void)
 
     ips_lcd_write_command(0x29);
 
-    // LCD_Fill(0, 0, 200, 200, BLACK);
-    // LCD_Fill(0,0,LCD_W,LCD_H,WHITE);
-    LCD_Fill(0, 0, 239, 134/2, BLACK);
-    LCD_DrawRectangle(0, 0, 230, 130, BLUE);
-    // LCD_DrawPoint(20, 15 , GREEN);
-    // LCD_DrawLine(10, 10, 40, 40, RED);
-    // LCD_DrawLine(10, 10, 40, 40, RED);
-    // LCD_DrawRectangle(10, 10, 40, 40, RED);
-    // LCD_DrawRectangle(10, 50, 40, 130, GREEN);
-    // LCD_DrawRectangle(70, 50, 150, 130, BLUE);
+    LCD_Fill(0,0,LCD_W,LCD_H,BLACK);
 
-    LCD_ShowPicture(160,95,40,40,gImage_1);
+
 }

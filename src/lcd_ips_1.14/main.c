@@ -17,7 +17,7 @@
 #include <sysctl.h>
 #include "board_config.h"
 #include "syslog.h"
-
+#include "pic.h"
 #include "fpioa.h"
 #include "gpiohs.h"
 #include "uarths.h"
@@ -38,6 +38,8 @@ int main(void)
     printk(LOG_COLOR_W "-------------------------------\r\n");
 
     ips_lcd_init();
+    LCD_DrawRectangle(0, 0, LCD_W-1, LCD_H-1, RED);
+    LCD_ShowPicture(10, 20, 40, 40, gImage_1);
 
     printk(LOG_COLOR_W "-------------END---------------\r\n");
     return 0;
