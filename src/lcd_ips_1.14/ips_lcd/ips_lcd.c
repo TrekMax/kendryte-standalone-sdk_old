@@ -222,7 +222,6 @@ void LCD_ShowPicture(uint16_t x, uint16_t y, uint16_t length, uint16_t width, co
     spi_send_data_standard(SPI_INDEX, SPI_CHIP_SELECT_NSS, NULL, 0, pic, num);
 }
 
-
 /******************************************************************************
       函数说明：在指定区域填充颜色
       入口数据：xsta,ysta   起始坐标
@@ -239,10 +238,9 @@ void LCD_Fill(uint16_t x, uint16_t y, uint16_t length, uint16_t width, uint16_t 
     LCD_Address_Set(x, y, x + length - 1, y + width - 1);
 
     spi_init(SPI_INDEX, SPI_WORK_MODE_0, SPI_FF_STANDARD, 32, 0);
-    spi_init_non_standard(SPI_INDEX, 0/*instrction length*/, 32/*address length*/, 0/*wait cycles*/,
-                          SPI_AITM_AS_FRAME_FORMAT/*spi address trans mode*/);
-    spi_fill_data_dma(DMAC_CHANNEL0, SPI_INDEX, SPI_CHIP_SELECT_NSS, &data, num/2);
-
+    spi_init_non_standard(SPI_INDEX, 0 /*instrction length*/, 32 /*address length*/, 0 /*wait cycles*/,
+                          SPI_AITM_AS_FRAME_FORMAT /*spi address trans mode*/);
+    spi_fill_data_dma(DMAC_CHANNEL0, SPI_INDEX, SPI_CHIP_SELECT_NSS, &data, num / 2);
 }
 /******************************************************/
 
@@ -341,7 +339,18 @@ void ips_lcd_init(void)
 
     ips_lcd_write_command(0x29);
 
-    LCD_Fill(0,0,LCD_W,LCD_H,BLACK);
+    LCD_Fill(0, 0, LCD_W, LCD_H, BLACK);
+}
 
-
+void ips_lcd_color_bar_test(void)
+{
+    uint8_t color_bar_w = LCD_W / 8;
+    LCD_Fill(color_bar_w * 0, 0, color_bar_w, LCD_H, WHITE);
+    LCD_Fill(color_bar_w * 1, 0, color_bar_w, LCD_H, YELLOW);
+    LCD_Fill(color_bar_w * 2, 0, color_bar_w, LCD_H, GBLUE);
+    LCD_Fill(color_bar_w * 3, 0, color_bar_w, LCD_H, GREEN);
+    LCD_Fill(color_bar_w * 4, 0, color_bar_w, LCD_H, CYAN);
+    LCD_Fill(color_bar_w * 5, 0, color_bar_w, LCD_H, RED);
+    LCD_Fill(color_bar_w * 6, 0, color_bar_w, LCD_H, BLUE);
+    LCD_Fill(color_bar_w * 7, 0, color_bar_w, LCD_H, BLACK);
 }
