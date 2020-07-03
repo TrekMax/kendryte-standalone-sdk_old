@@ -476,6 +476,10 @@ void uart_set_det(uart_device_number_t uart_channel, uart_det_mode_t det_mode, s
  */
 void uart_debug_init(uart_device_number_t uart_channel);
 
+
+int uart_getc(void);
+int uart_putc(char c);
+
 #ifdef __cplusplus
 }
 #endif

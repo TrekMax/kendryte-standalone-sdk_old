@@ -97,6 +97,7 @@ static int uart_irq_callback(void *param)
 
 static uart_device_number_t s_uart_debug_channel = UART_DEVICE_3;
 
+
 static int uart_channel_putc(char c, uart_device_number_t channel)
 {
     while(uart[channel]->LSR & (1u << 5))
@@ -112,6 +113,16 @@ static int uart_channel_getc(uart_device_number_t channel)
         return EOF;
     else
         return (char)(uart[channel]->RBR & 0xff);
+}
+
+int uart_putc(char c)
+{
+    return uart_channel_putc(c, UART_DEVICE_3);
+}
+
+int uart_getc(void)
+{
+    return uart_channel_getc(UART_DEVICE_3);
 }
 
 static int uart_debug_putchar(char c)
