@@ -144,8 +144,8 @@ void dvp_sensor_init(void)
     dvp_enable_burst();
     dvp_set_output_enable(0, 1);
     dvp_set_output_enable(1, 1);
-    // dvp_set_image_format(DVP_CFG_YUV_FORMAT);
-    dvp_set_image_format(DVP_CFG_RGB_FORMAT);
+    dvp_set_image_format(DVP_CFG_YUV_FORMAT);
+    // dvp_set_image_format(DVP_CFG_RGB_FORMAT);
 
     dvp_set_image_size(320, 240);
     // dvp_set_image_size(640, 480);
@@ -189,9 +189,9 @@ void dvp_sensor_init(void)
         lcd_draw_picture(0, 0, 320, 240, g_ram_mux ? g_lcd_gram0 : g_lcd_gram1);
         // if(g_dvp_finish_flag)
         // {
-        sprintf(name, "0:photo_%03d.bmp", count++);
-        LOGI(TAG, "rgb565tobmp:%s",name);
-        rgb565tobmp((uint8_t *)(g_ram_mux ? g_lcd_gram0 : g_lcd_gram1), 320, 240, _T(name));
+        // sprintf(name, "0:photo_%03d.bmp", count++);
+        // LOGI(TAG, "rgb565tobmp:%s",name);
+        // rgb565tobmp((uint8_t *)(g_ram_mux ? g_lcd_gram0 : g_lcd_gram1), 320, 240, _T(name));
         //     // break;
         //     g_dvp_finish_flag = 0;
         // }
@@ -268,29 +268,29 @@ int main(void)
     g_lcd_gram1 = (uint32_t *)iomem_malloc(320 * 240 * 2);
     sdcard_io_mux_init();
     dmac_init();
-    /* SD card init */
-    if(sd_init())
-    {
-        printf("Fail to init SD card\n");
-        return -1;
-    }
+    // /* SD card init */
+    // if(sd_init())
+    // {
+    //     printf("Fail to init SD card\n");
+    //     return -1;
+    // }
 
-    LOGI(TAG, "SD card TEST");
-    if(sdcard_test())
-    {
-        LOGE(TAG, "SD card err");
-        return -1;
-    }
-    if(fs_test())
-    {
-        LOGI(TAG, "FAT32 err");
-        return -1;
-    }
-    if(sd_write_test(_T("0:test.txt")))
-    {
-        LOGE(TAG, "SD write err");
-        return -1;
-    }
+    // LOGI(TAG, "SD card TEST");
+    // if(sdcard_test())
+    // {
+    //     LOGE(TAG, "SD card err");
+    //     return -1;
+    // }
+    // if(fs_test())
+    // {
+    //     LOGI(TAG, "FAT32 err");
+    //     return -1;
+    // }
+    // if(sd_write_test(_T("0:test.txt")))
+    // {
+    //     LOGE(TAG, "SD write err");
+    //     return -1;
+    // }
     // LCD Display Test
     // rgb888_to_lcd(gImage_image, lcd_gram, 320, 240);
     // lcd_draw_picture(0, 0, 320, 240, lcd_gram);

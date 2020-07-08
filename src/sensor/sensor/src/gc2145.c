@@ -16,7 +16,9 @@
 #include "dvp.h"
 #include "fpioa.h"
 #include "gc2145.h"
-#include "gc2145cfg.h"
+// #include "gc2145cfg.h"
+#include "gc2145_regs-v1.h"
+// #include "gc2145cfg-NG-v1.h"
 #include "i2c.h"
 #include "plic.h"
 #include "sleep.h"
@@ -68,7 +70,8 @@ int gc2145_read_id(uint8_t num, uint16_t *id)
     return 0;
 }
 
-#define sensor_default_regs gc2145_sensor_default_regs
+// #define sensor_default_regs gc2145_sensor_default_regs
+#define sensor_default_regs sensor_gc2145_default_regs
 
 int gc2145_init(void)
 {
@@ -91,6 +94,12 @@ int gc2145_init(void)
         //     printf("\r\n%5d:  ", (i/10));
         // }
         // printf("%02X  ", data);
+    }
+    // printf("-----------------------");
+    for(i = 0; sensor_gc2145_qvga_config[i][0]; i++)
+    {
+        gc2145_wr_reg(num, sensor_gc2145_qvga_config[i][0], sensor_gc2145_qvga_config[i][1]);
+
     }
     return 0;
 }
