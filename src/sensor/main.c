@@ -37,6 +37,41 @@
 
 #include "board_config.h"
 
+
+const int resolution[][2] = {
+    {0, 0},
+    // C/SIF Resolutions
+    {88, 72},   /* QQCIF     */
+    {176, 144}, /* QCIF      */
+    {352, 288}, /* CIF       */
+    {88, 60},   /* QQSIF     */
+    {176, 120}, /* QSIF      */
+    {352, 240}, /* SIF       */
+    // VGA Resolutions
+    {40, 30},   /* QQQQVGA   */
+    {80, 60},   /* QQQVGA    */
+    {160, 120}, /* QQVGA     */
+    {320, 240}, /* QVGA      */
+    {640, 480}, /* VGA       */
+    {60, 40},   /* HQQQVGA   */
+    {120, 80},  /* HQQVGA    */
+    {240, 160}, /* HQVGA     */
+    // FFT Resolutions
+    {64, 32},   /* 64x32     */
+    {64, 64},   /* 64x64     */
+    {128, 64},  /* 128x64    */
+    {128, 128}, /* 128x128    */
+    {240, 240}, /* 240x240    */
+    // Other
+    {128, 160},   /* LCD       */
+    {128, 160},   /* QQVGA2    */
+    {720, 480},   /* WVGA      */
+    {752, 480},   /* WVGA2     */
+    {800, 600},   /* SVGA      */
+    {1280, 1024}, /* SXGA      */
+    {1600, 1200}, /* UXGA      */
+};
+
 static const char *TAG = "main";
 
 static uint32_t *g_lcd_gram0;
@@ -144,11 +179,12 @@ void dvp_sensor_init(void)
     dvp_enable_burst();
     dvp_set_output_enable(0, 1);
     dvp_set_output_enable(1, 1);
-    dvp_set_image_format(DVP_CFG_YUV_FORMAT);
-    // dvp_set_image_format(DVP_CFG_RGB_FORMAT);
+    // dvp_set_image_format(DVP_CFG_YUV_FORMAT);
+    dvp_set_image_format(DVP_CFG_RGB_FORMAT);
 
-    dvp_set_image_size(320, 240);
-    // dvp_set_image_size(640, 480);
+    // dvp_set_image_size(160, 120);//QQVGA
+    dvp_set_image_size(320, 240);//QVGA
+    // dvp_set_image_size(640, 480);//VGA
     gc2145_init();
 #else
     LOGE(TAG, "Undefined camera model!");
