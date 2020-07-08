@@ -45,6 +45,15 @@
 #define SPI_CHANNEL             0
 #define SPI_SLAVE_SELECT        3
 
+
+#define SD_SPI_INDEX    1
+#define SD_SPI_SCLK     27
+#define SD_SPI_MOSI     28
+#define SD_SPI_MISO     26
+
+#define SD_SPI_CS_PIN   29
+
+
 #elif (BOARD == BOARD_MAIX_CUBE)
 
 #else
