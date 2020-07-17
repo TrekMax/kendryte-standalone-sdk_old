@@ -130,6 +130,8 @@ int main(void)
     lcd_set_direction(DIR_XY_RLUD);
     lcd_set_direction(DIR_YX_RLDU);
     tft_write_command(INVERSION_DISPALY_ON);
+#elif (BOARD == BOARD_MAIX_NEW_GO)
+    lcd_set_direction(DIR_YX_RLUD | 0x08);     /* left up 0,0 */
 #else
     lcd_set_direction(DIR_YX_RLUD | 0x08);     /* left up 0,0 */
 #endif

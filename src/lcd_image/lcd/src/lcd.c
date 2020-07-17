@@ -40,58 +40,111 @@ void tft_write_onebyte(uint8_t data)
 void lcd_init(void)
 {
     uint8_t data = 0;
-
     tft_hard_init();
     /*soft reset*/
     tft_write_command(SOFTWARE_RESET);
     usleep(100000);
 
 #if (BOARD == BOARD_MAIX_NEW_GO)
+    uint8_t t[15];
 
-    tft_write_command(0XF8);//
-    tft_write_onebyte(0x21);
-    tft_write_onebyte(0x04);
+    tft_write_command(0XF1); /* Unk */
+    t[0] = (0x36);
+    t[1] = (0x04);
+    t[2] = (0x00);
+    t[3] = (0x3C);
+    t[4] = (0X0F);
+    t[5] = (0x8F);
+    tft_write_byte(t, 6);
+
+    tft_write_command(0XF2); /* Unk */
+    t[0] = (0x18);
+    t[1] = (0xA3);
+    t[2] = (0x12);
+    t[3] = (0x02);
+    t[4] = (0XB2);
+    t[5] = (0x12);
+    t[6] = (0xFF);
+    t[7] = (0x10);
+    t[8] = (0x00);
+    tft_write_byte(t, 9);
+
+    tft_write_command(0XF8); /* Unk */
+    t[0] = (0x21);
+    t[1] = (0x04);
+    tft_write_byte(t, 2);
+
+    tft_write_command(0XF9); /* Unk */
+    t[0] = (0x00);
+    t[1] = (0x08);
+    tft_write_byte(t, 2);
+
+    tft_write_command(0x36); /* Memory Access Control */
+    t[0] = (0x28);
+    tft_write_byte(t, 1);
+
+    tft_write_command(0xB4); /* Display Inversion Control */
+    t[0] = (0x00);
+    tft_write_byte(t, 1);
+
+    tft_write_command(0xB6); /* Display Function Control */
+    t[0] = (0x02);
+    // t[1] = (0x22);
+    tft_write_byte(t, 1);
+
+    tft_write_command(0xC1); /* Power Control 2 */
+    t[0] = (0x41);
+    tft_write_byte(t, 1);
     
-    tft_write_command(0XF9);//
-    tft_write_onebyte(0x00);
-    tft_write_onebyte(0x08);
+    tft_write_command(0xC5); /* Vcom Control */
+    t[0] = (0x00);
+    t[1] = (0x18);
+    tft_write_byte(t, 2);
 
-    tft_write_command(0x36);//
-    tft_write_onebyte(0x08);
+    tft_write_command(0xE0); /* Positive Gamma Control */
+    t[0] = (0x0F);
+    t[1] = (0x1F);
+    t[2] = (0x1C);
+    t[3] = (0x0C);
+    t[4] = (0x0F);
+    t[5] = (0x08);
+    t[6] = (0x48);
+    t[7] = (0x98);
+    t[8] = (0x37);
+    t[9] = (0x0A);
+    t[10] = (0x13);
+    t[11] = (0x04);
+    t[12] = (0x11);
+    t[13] = (0x0D);
+    t[14] = (0x00);
+    tft_write_byte(t, 15);
 
-    tft_write_command(0xE0);//
-    tft_write_onebyte(0x0F);
-    tft_write_onebyte(0x1F);
-    tft_write_onebyte(0x1C);
-    tft_write_onebyte(0x0C);
-    tft_write_onebyte(0x0F);
-    tft_write_onebyte(0x08);
-    tft_write_onebyte(0x48);
-    tft_write_onebyte(0x98);
-    tft_write_onebyte(0x37);
-    tft_write_onebyte(0x0A);
-    tft_write_onebyte(0x13);
-    tft_write_onebyte(0x04);
-    tft_write_onebyte(0x11);
-    tft_write_onebyte(0x0D);
-    tft_write_onebyte(0x00);
+    tft_write_command(0xE1); /* Negative Gamma Control */
+    t[0] = (0x0F);
+    t[1] = (0x32);
+    t[2] = (0x2E);
+    t[3] = (0x0B);
+    t[4] = (0x0D);
+    t[5] = (0x05);
+    t[6] = (0x47);
+    t[7] = (0x75);
+    t[8] = (0x37);
+    t[9] = (0x06);
+    t[10] = (0x10);
+    t[11] = (0x03);
+    t[12] = (0x24);
+    t[13] = (0x20);
+    t[14] = (0x00);
+    tft_write_byte(t, 15);
 
-    tft_write_command(0xE1);//
-    tft_write_onebyte(0x0F);
-    tft_write_onebyte(0x32);
-    tft_write_onebyte(0x2E);
-    tft_write_onebyte(0x0B);
-    tft_write_onebyte(0x0D);
-    tft_write_onebyte(0x05);
-    tft_write_onebyte(0x47);
-    tft_write_onebyte(0x75);
-    tft_write_onebyte(0x37);
-    tft_write_onebyte(0x06);
-    tft_write_onebyte(0x10);
-    tft_write_onebyte(0x03);
-    tft_write_onebyte(0x24);
-    tft_write_onebyte(0x20);
-    tft_write_onebyte(0x00);
+    tft_write_command(0x3A); /* Interface Pixel Format */
+    t[0] = (0x55);
+    tft_write_byte(t, 1);
+
+    tft_write_command(0x11); /* Sleep OUT */
+    msleep(120);
+    tft_write_command(0x29); /* Display ON */
+
 #endif 
     /*soft reset*/
     tft_write_command(SOFTWARE_RESET);
