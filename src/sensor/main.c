@@ -162,11 +162,9 @@ void dvp_sensor_init(void)
 
     dvp_set_image_size(320, 240);
     ov2640_init();
-#elif(CAMERA == CAMERA_GC0328)
+
+    #elif (CAMERA == CAMERA_GC0328)
     dvp_init(8);
-    dvp_set_xclk_rate(24000000);
-    dvp_enable_burst();
-    dvp_set_output_enable(0, 1);
     dvp_set_output_enable(1, 1);
     dvp_set_image_format(DVP_CFG_RGB_FORMAT);
 
@@ -230,14 +228,11 @@ void dvp_sensor_init(void)
         // rgb565tobmp((uint8_t *)(g_ram_mux ? g_lcd_gram0 : g_lcd_gram1), 320, 240, _T(name));
         //     // break;
         //     g_dvp_finish_flag = 0;
-        // }
 
     }
     iomem_free(g_lcd_gram0);
     iomem_free(g_lcd_gram1);
 }
-
-extern const unsigned char gImage_image[] __attribute__((aligned(128)));
 
 static uint16_t lcd_gram[320 * 240] __attribute__((aligned(32)));
 void rgb888_to_lcd(uint8_t *src, uint16_t *dest, size_t width, size_t height)
