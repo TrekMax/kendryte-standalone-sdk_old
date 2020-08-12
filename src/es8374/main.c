@@ -18,6 +18,7 @@
 
 #include "es8374.h"
 
+
 static int sdcard_test(void);
 static int fs_test(void);
 static int wav_test(TCHAR *path);
@@ -49,6 +50,17 @@ void i2s_io_mux_init()
     fpioa_set_function(CONFIG_PIN_NUM_ES8374_WS,    FUNC_I2S0_WS + 11 * ES8374_I2S_DEVICE);
     fpioa_set_function(CONFIG_PIN_NUM_ES8374_DOUT,  FUNC_I2S0_IN_D0 + 11 * ES8374_I2S_DEVICE);
     fpioa_set_function(CONFIG_PIN_NUM_ES8374_DIN,   FUNC_I2S0_OUT_D2 + 11 * ES8374_I2S_DEVICE);
+
+    fpioa_set_io_driving(CONFIG_PIN_NUM_ES8374_MCLK,  FPIOA_DRIVING_0);
+    fpioa_set_io_driving(CONFIG_PIN_NUM_ES8374_SCLK,  FPIOA_DRIVING_0);
+    fpioa_set_io_driving(CONFIG_PIN_NUM_ES8374_WS,    FPIOA_DRIVING_0);
+    fpioa_set_io_driving(CONFIG_PIN_NUM_ES8374_DOUT,  FPIOA_DRIVING_0);
+    fpioa_set_io_driving(CONFIG_PIN_NUM_ES8374_DIN,   FPIOA_DRIVING_0);
+    fpioa_set_sl(CONFIG_PIN_NUM_ES8374_MCLK,  1);
+    fpioa_set_sl(CONFIG_PIN_NUM_ES8374_SCLK,  1);
+    fpioa_set_sl(CONFIG_PIN_NUM_ES8374_WS,    1);
+    fpioa_set_sl(CONFIG_PIN_NUM_ES8374_DOUT,  1);
+    fpioa_set_sl(CONFIG_PIN_NUM_ES8374_DIN,   1);
 }
 
 void audio_es8374_config_init(void)
@@ -86,10 +98,12 @@ void audio_es8374_config_init(void)
 
     es8374_write_reg(0x1e, 0xA4);
 
-    LOGI(TAG, "es8374 read reg all");
-    es8374_read_all();
+    // LOGI(TAG, "es8374 read reg all");
+    // es8374_read_all();
 
 }
+
+
 
 int main(void)
 {
@@ -108,7 +122,6 @@ int main(void)
 
     LOGI(TAG, "%s", __FUNCTION__);
     io_mux_init();
-    i2s_io_mux_init();
 
     dmac_init();
     plic_init();
@@ -304,10 +317,20 @@ static int wav_test(TCHAR *path)
     LOGI(TAG, "blockalign:%d", wav_file.blockalign);
     LOGI(TAG, "bitspersample:%d", wav_file.bitspersample);
     LOGI(TAG, "datasize:%d", wav_file.datasize);
-    
+
+
+    LOGI(TAG, "start decode");
+    status = wav_decode_init(&wav_file);
+    if (OK != status) {
+        f_close(&file);
+        LOGI(TAG, "decode init fail");
+        return -1;
+    }    
+replay:
     audio_es8374_config_init();
     i2s_init(I2S_DEVICE_0, I2S_TRANSMITTER, 0x0c);
-
+    // i2s_set_enable(I2S_DEVICE_0, 0);
+    
     uint32_t i2s_freq = sysctl_clock_get_freq(SYSCTL_CLOCK_I2S0);
     LOGI(TAG, "1.i2s clock is: %d", i2s_freq);
 
@@ -319,16 +342,10 @@ static int wav_test(TCHAR *path)
     i2s_rx_channel_config(ES8374_I2S_DEVICE, ES8374_RX_CHANNEL, RESOLUTION_16_BIT, SCLK_CYCLES_32, TRIGGER_LEVEL_4, STANDARD_MODE);
 
     i2s_set_sample_rate(ES8374_I2S_DEVICE, wav_file.samplerate/2);
+    
     dmac_set_irq(ES8374_TX_DMAC_CHANNEL, on_irq_dma3, NULL, 1);
+    i2s_io_mux_init();
 
-
-    LOGI(TAG, "start decode");
-    status = wav_decode_init(&wav_file);
-    if (OK != status) {
-        f_close(&file);
-        LOGI(TAG, "decode init fail");
-        return -1;
-    }
     LOGI(TAG, "decode ok");
     i2s_play(ES8374_I2S_DEVICE, ES8374_TX_DMAC_CHANNEL, 
         (void *)wav_file.buff_current, wav_file.buff_current_len, wav_file.buff_current_len, 16, 2);
@@ -347,5 +364,6 @@ static int wav_test(TCHAR *path)
     }
     f_close(&file);
     wav_decode_finish(&wav_file);
+    goto replay;
     return 0;
 }
