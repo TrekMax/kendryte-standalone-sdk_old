@@ -57,10 +57,11 @@ psram_status_t psram_init(uint8_t spi_index, uint8_t spi_ss)
     spi_chip_select = spi_ss;
 
     spi_init(spi_bus_no, SPI_WORK_MODE_0, SPI_FF_STANDARD, DATALENGTH, 0);
-    uint32_t ret = spi_set_clk_rate(spi_bus_no,  10*1000*1000);//10Mhz
+    uint32_t ret = spi_set_clk_rate(spi_bus_no,  30*1000*1000);//10Mhz
     LOGI(TAG, "spi clk is %d", ret);
     return PSRAM_OK;
 }
+
 //exit QPI mode(set back to SPI mode)
 void psram_disable_quad_mode(void)
 {
@@ -87,9 +88,9 @@ void psram_enable_quad_mode(void)
     cmd[0] = PSRAM_ENTER_QMODE;//小端模式
     spi_init(spi_bus_no, SPI_WORK_MODE_0, SPI_FF_STANDARD, 8, 0);
     spi_send_data_standard(spi_bus_no, spi_chip_select, cmd, 1, NULL, 0);
-
 }
 
+//read psram id, should issue `psram_disable_quad_mode` before calling this
 psram_status_t psram_read_id(uint64_t *device_id)
 {
     uint32_t psram_id[2] = {0};
