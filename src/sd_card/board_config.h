@@ -10,13 +10,13 @@
 
 #define BOARD_MAIX_M1N      5
 #define BOARD_MAIX_CUBE     6
-#define BOARD_MAIX_NEW_GO   7
+#define BOARD_MAIX_AMIGO    7
 
 
-#define BOARD BOARD_MAIX_NEW_GO
-#define BOARD_NAME  "BOARD_MAIX_NEW_GO"
+#define BOARD BOARD_MAIX_GO
+#define BOARD_NAME  "BOARD_MAIX_GO"
 
-#if ((BOARD == BOARD_MAIX_CUBE) || (BOARD == BOARD_MAIX_M1N))
+#if ((BOARD == BOARD_MAIX_CUBE) || (BOARD == BOARD_MAIX_M1N) || (BOARD == BOARD_MAIX_GO))
 
 #define SPI_INDEX           1
 #define SPI_SCLK_RATE       600*1000
@@ -42,7 +42,7 @@
 
 #define SD_SPI_CS_PIN   29
 
-#elif (BOARD == BOARD_MAIX_NEW_GO)
+#elif (BOARD == BOARD_MAIX_AMIGO)
     /*
     SD_SPI_SCLK     11
     SD_SPI_MOSI     10
