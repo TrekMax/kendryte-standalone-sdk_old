@@ -38,11 +38,11 @@ int main(void)
     printk(LOG_COLOR_W "-------------------------------\r\n");
 
     ips_lcd_init();
-    LCD_DrawRectangle(0, 0, LCD_W-1, LCD_H-1, RED);
-    LCD_ShowPicture(10, 20, 40, 40, gImage_1);
-
     ips_lcd_color_bar_test();
-    
+    LCD_ShowPicture(10, 20, 40, 40, gImage_1);
+    LCD_DrawRectangle(0, 0, LCD_W-1, LCD_H-1, RED);
+
+
     printk(LOG_COLOR_W "-------------END---------------\r\n");
     return 0;
 }

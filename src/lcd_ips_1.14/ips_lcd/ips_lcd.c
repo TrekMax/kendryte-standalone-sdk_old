@@ -33,7 +33,6 @@ static void spi_write_reg(uint8_t reg_addr, uint8_t data)
 {
     uint8_t cmd[2] = {reg_addr, data};
 
-    spi_init(SPI_INDEX, SPI_WORK_MODE_0, SPI_FF_STANDARD, DATALENGTH, 0);
     spi_send_data_standard(SPI_INDEX, SPI_CHIP_SELECT_NSS, cmd, 2, NULL, 0);
 }
 
@@ -41,7 +40,6 @@ static void spi_read_reg(uint8_t reg_addr, uint8_t *reg_data)
 {
     uint8_t cmd[1] = {reg_addr};
 
-    spi_init(SPI_INDEX, SPI_WORK_MODE_0, SPI_FF_STANDARD, DATALENGTH, 0);
     spi_receive_data_standard(SPI_INDEX, SPI_CHIP_SELECT_NSS, cmd, 1, reg_data, 1);
 }
 
@@ -50,7 +48,6 @@ static void ips_lcd_write_command(uint8_t command)
     uint8_t cmd[1] = {command};
     gpiohs_set_pin(SPI_IPS_LCD_DC_GPIO_NUM, GPIO_PV_LOW);
 
-    spi_init(SPI_INDEX, SPI_WORK_MODE_0, SPI_FF_STANDARD, DATALENGTH, 0);
     spi_send_data_standard(SPI_INDEX, SPI_CHIP_SELECT_NSS, cmd, 1, NULL, 0);
 
     gpiohs_set_pin(SPI_IPS_LCD_DC_GPIO_NUM, GPIO_PV_HIGH);
@@ -61,7 +58,6 @@ static void ips_lcd_write_data(uint8_t data)
     uint8_t cmd[1] = {data};
     gpiohs_set_pin(SPI_IPS_LCD_DC_GPIO_NUM, GPIO_PV_HIGH);
 
-    spi_init(SPI_INDEX, SPI_WORK_MODE_0, SPI_FF_STANDARD, DATALENGTH, 0);
     spi_send_data_standard(SPI_INDEX, SPI_CHIP_SELECT_NSS, cmd, 1, NULL, 0);
 }
 
@@ -210,7 +206,7 @@ void LCD_DrawRectangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint1
       入口数据：x,y起点坐标
                 length 图片长度
                 width  图片宽度
-                pic[]  图片数组    
+                pic[]  图片数组
       返回值：  无
 ******************************************************************************/
 void LCD_ShowPicture(uint16_t x, uint16_t y, uint16_t length, uint16_t width, const uint8_t pic[])
@@ -218,7 +214,6 @@ void LCD_ShowPicture(uint16_t x, uint16_t y, uint16_t length, uint16_t width, co
     uint16_t num;
     num = length * width * 2;
     LCD_Address_Set(x, y, x + length - 1, y + width - 1);
-    spi_init(SPI_INDEX, SPI_WORK_MODE_0, SPI_FF_STANDARD, DATALENGTH, 0);
     spi_send_data_standard(SPI_INDEX, SPI_CHIP_SELECT_NSS, NULL, 0, pic, num);
 }
 
@@ -241,23 +236,22 @@ void LCD_Fill(uint16_t x, uint16_t y, uint16_t length, uint16_t width, uint16_t 
     spi_init_non_standard(SPI_INDEX, 0 /*instrction length*/, 32 /*address length*/, 0 /*wait cycles*/,
                           SPI_AITM_AS_FRAME_FORMAT /*spi address trans mode*/);
     spi_fill_data_dma(DMAC_CHANNEL0, SPI_INDEX, SPI_CHIP_SELECT_NSS, &data, num / 2);
+    spi_init(SPI_INDEX, SPI_WORK_MODE_0, SPI_FF_STANDARD, DATALENGTH, 0);
 }
 /******************************************************/
 
 void ips_lcd_init(void)
 {
     ips_lcd_io_mux_init();
+    spi_init(SPI_INDEX, SPI_WORK_MODE_0, SPI_FF_STANDARD, DATALENGTH, 0);
 
     gpiohs_set_pin(SPI_IPS_LCD_RST_GPIO_NUM, GPIO_PV_LOW);
-    msleep(100);
+    msleep(10);
     gpiohs_set_pin(SPI_IPS_LCD_RST_GPIO_NUM, GPIO_PV_HIGH);
-    msleep(100);
-
-    gpiohs_set_pin(SPI_IPS_LCD_BL_GPIO_NUM, GPIO_PV_LOW);
-    msleep(100);
+    msleep(10);
 
     ips_lcd_write_command(0x11);
-    msleep(120);
+    msleep(10);
     ips_lcd_write_command(0x36);
     if(USE_HORIZONTAL == 0)
         ips_lcd_write_data(0x00);
@@ -339,6 +333,7 @@ void ips_lcd_init(void)
 
     ips_lcd_write_command(0x29);
 
+    gpiohs_set_pin(SPI_IPS_LCD_BL_GPIO_NUM, GPIO_PV_LOW);
     LCD_Fill(0, 0, LCD_W, LCD_H, BLACK);
 }
 
