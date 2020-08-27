@@ -16,23 +16,22 @@
 #include "unistd.h"
 
 #include "fpioa.h"
-#include "sysctl.h"
 #include "gpiohs.h"
+#include "sysctl.h"
 
-#include <timer.h>
 #include <pwm.h>
+#include <timer.h>
 
 #include "board_config.h"
 
-#include "nt35310.h"
+#include "board_config.h"
 #include "image.h"
 #include "lcd.h"
-#include "syslog.h"
+#include "nt35310.h"
 #include "sleep.h"
-#include "board_config.h"
+#include "syslog.h"
 
 static const char *TAG = "main";
-
 
 static void io_set_power(void)
 {
@@ -44,7 +43,7 @@ static void io_mux_init(void)
 {
     fpioa_set_function(LCD_RST_PIN_NUM, FUNC_GPIOHS0 + RST_GPIO_HS_NUM);
     fpioa_set_function(LCD_DCX_PIN_NUM, FUNC_GPIOHS0 + DCX_GPIO_HS_NUM);
-    fpioa_set_function(LCD_CS_PIN_NUM,  FUNC_SPI0_SS0 + SPI_SLAVE_SELECT);
+    fpioa_set_function(LCD_CS_PIN_NUM, FUNC_SPI0_SS0 + SPI_SLAVE_SELECT);
     fpioa_set_function(LCD_CLK_PIN_NUM, FUNC_SPI0_SCLK);
     sysctl_set_spi0_dvp_data(1);
 
@@ -57,9 +56,9 @@ static void io_mux_init(void)
 
 #if LCD_BL_CONTROL
 
-#define TIMER_NOR   0
-#define TIMER_CHN   0
-#define TIMER_PWM   1
+#define TIMER_NOR 0
+#define TIMER_CHN 0
+#define TIMER_PWM 1
 #define TIMER_PWM_CHN 0
 
 int timer_callback(void *ctx)
@@ -67,15 +66,14 @@ int timer_callback(void *ctx)
     static double cnt = 0.01;
     static int flag = 0;
 
-    pwm_set_frequency(TIMER_PWM, TIMER_PWM_CHN, 200*1000, cnt);
+    pwm_set_frequency(TIMER_PWM, TIMER_PWM_CHN, 200 * 1000, cnt);
 
-    flag ? (cnt -= 0.01): (cnt += 0.01);
+    flag ? (cnt -= 0.01) : (cnt += 0.01);
     if(cnt > 1.0)
     {
         cnt = 1.0;
         flag = 1;
-    }
-    else if (cnt < 0.2)
+    } else if(cnt < 0.2)
     {
         cnt = 0.2;
         flag = 0;
@@ -94,7 +92,7 @@ void lcd_bl_control()
     /* Init timer */
     timer_init(TIMER_NOR);
     /* Set timer interval to 100ms (1e8ns) */
-    timer_set_interval(TIMER_NOR, TIMER_CHN, 1000*1000*100);
+    timer_set_interval(TIMER_NOR, TIMER_CHN, 1000 * 1000 * 100);
     /* Set timer callback function with repeat method */
     timer_irq_register(TIMER_NOR, TIMER_CHN, 0, 1, timer_callback, NULL);
     /* Enable timer */
@@ -112,7 +110,7 @@ int main(void)
 {
     uint32_t freq = 0;
     freq = sysctl_pll_set_freq(SYSCTL_PLL0, 800000000);
-    
+
     printk(LOG_COLOR_W "-------------------------------\r\n");
     printk(LOG_COLOR_W "Sipeed@QinYUN575\r\n");
     printk(LOG_COLOR_W "Compile@ %s %s\r\n", __DATE__, __TIME__);
@@ -124,16 +122,16 @@ int main(void)
     io_set_power();
     lcd_init();
 
-#if (BOARD == BOARD_MAIX_DUINO)
-    lcd_set_direction(DIR_YX_RLDU);     /* left up 0,0 */
-#elif  (BOARD == BOARD_MAIX_CUBE)
+#if(BOARD == BOARD_MAIX_DUINO)
+    lcd_set_direction(DIR_YX_RLDU); /* left up 0,0 */
+#elif(BOARD == BOARD_MAIX_CUBE)
     lcd_set_direction(DIR_XY_RLUD);
     lcd_set_direction(DIR_YX_RLDU);
     tft_write_command(INVERSION_DISPALY_ON);
-#elif (BOARD == BOARD_MAIX_NEW_GO)
-    lcd_set_direction(DIR_YX_RLUD | 0x08);     /* left up 0,0 */
+#elif(BOARD == BOARD_MAIX_NEW_GO)
+    lcd_set_direction(DIR_YX_RLUD | 0x08); /* left up 0,0 */
 #else
-    lcd_set_direction(DIR_YX_RLUD | 0x08);     /* left up 0,0 */
+    lcd_set_direction(DIR_YX_RLUD | 0x08); /* left up 0,0 */
 #endif
 #if LCD_BL_CONTROL
     lcd_bl_control();
@@ -147,5 +145,6 @@ int main(void)
     lcd_draw_string(0, 20, "Hello World", GREEN);
     lcd_draw_string(0, 40, "Hello World", BLUE);
     printk(LOG_COLOR_W "-------------END---------------\r\n");
-    while (1);
+    while(1)
+        ;
 }
