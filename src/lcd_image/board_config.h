@@ -3,17 +3,18 @@
 
 #define CONFIG_LOG_COLORS 1
 
-#define BOARD_MAIX_DOCK     1
-#define BOARD_MAIX_DUINO    2
-#define BOARD_MAIX_CUBE     3
-#define BOARD_MAIX_BIT      4
-#define BOARD_MAIX_GO       5
-#define BOARD_MAIX_NEW_GO   6
+#define BOARD_MAIX_DOCK         1
+#define BOARD_MAIX_DUINO        2
+#define BOARD_MAIX_CUBE         3
+#define BOARD_MAIX_BIT          4
+#define BOARD_MAIX_GO           5
+#define BOARD_MAIX_NEW_GO       6
+#define BOARD_MAIX_AMIGO_IPS    7
 
-#define BOARD   BOARD_MAIX_NEW_GO
-#define BOARD_NAME "BOARD_MAIX_NEW_GO"
+#define BOARD   BOARD_MAIX_AMIGO_IPS
+#define BOARD_NAME "BOARD_MAIX_AMIGO_IPS"
 
-#if ((BOARD == BOARD_MAIX_DUINO) || (BOARD == BOARD_MAIX_NEW_GO) || (BOARD == BOARD_MAIX_CUBE))
+#if ((BOARD == BOARD_MAIX_DUINO) || (BOARD == BOARD_MAIX_NEW_GO) || (BOARD == BOARD_MAIX_CUBE)|| (BOARD == BOARD_MAIX_AMIGO_IPS))
 
 #define DCX_GPIO_HS_NUM        (2)
 #define RST_GPIO_HS_NUM        (30)

@@ -95,7 +95,7 @@ void lcd_init(void)
     tft_write_command(0xC1); /* Power Control 2 */
     t[0] = (0x41);
     tft_write_byte(t, 1);
-    
+
     tft_write_command(0xC5); /* Vcom Control */
     t[0] = (0x00);
     t[1] = (0x18);
@@ -145,7 +145,7 @@ void lcd_init(void)
     msleep(120);
     tft_write_command(0x29); /* Display ON */
 
-#endif 
+#endif
     /*soft reset*/
     tft_write_command(SOFTWARE_RESET);
     usleep(100000);
@@ -161,7 +161,7 @@ void lcd_init(void)
 
     /*display on*/
     tft_write_command(DISPALY_ON);
-    
+
     lcd_polling_enable();
 }
 
@@ -319,4 +319,3 @@ void lcd_draw_picture(uint16_t x1, uint16_t y1, uint16_t width, uint16_t height,
     lcd_set_area(x1, y1, x1 + width - 1, y1 + height - 1);
     tft_write_word(ptr, width * height / 2, lcd_ctl.mode ? 2 : 0);
 }
-
