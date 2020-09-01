@@ -23,7 +23,7 @@ uint32_t irq_flag;
 
 #define PIN_LED 32
 #define PIN_LEDW 18
-#define PIN_KEY 24
+#define PIN_KEY 16
 
 #define GPIO_LED 3
 #define GPIO_WLED 4
@@ -35,10 +35,10 @@ int irq_gpiohs2(void *ctx)
 {
     irq_flag = gpiohs_get_pin(GPIO_KEY);
 
-    printf("IRQ The PIN is %d\n", irq_flag);
+    printf("IRQ The PIN is %d\r\n", irq_flag);
 
     uint32_t *tmp = (uint32_t *)(ctx);
-    printf("count is %d\n", (*tmp)++);
+    printf("count is %d\r\n", (*tmp)++);
 
     if(!irq_flag)
     {

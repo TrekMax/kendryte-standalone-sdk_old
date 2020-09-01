@@ -32,10 +32,6 @@ void sx1278_hw_init(sx1278_hw_t *hw)
     spi_init(SPI_DEVICE_1, SPI_WORK_MODE_0, SPI_FF_STANDARD, DATALENGTH, 0);
 }
 
-void sx1278_hw_SetNSS(sx1278_hw_t *hw, int value)
-{
-}
-
 void sx1278_hw_delay_ms(uint32_t delay_mses)
 {
     msleep(delay_mses);
@@ -49,18 +45,6 @@ void sx1278_hw_reset(sx1278_hw_t *hw)
     sx1278_hw_delay_ms(10);
     gpiohs_set_pin(SPI_LORA_SX127X_RST_PIN_NUM, GPIO_PV_HIGH);
     sx1278_hw_delay_ms(100);
-}
-
-void sx1278_hw_SPICommand(sx1278_hw_t *hw, uint8_t cmd)
-{
-    spi_send_data_standard(SPI_DEVICE_1, SPI_CHIP_SELECT_NSS, &cmd, 1, NULL, 0);
-}
-
-uint8_t sx1278_hw_SPIReadByte(sx1278_hw_t *hw)
-{
-    uint8_t data = 0;
-    spi_receive_data_standard(SPI_DEVICE_1, SPI_CHIP_SELECT_NSS, NULL, 0, &data, 1);
-    return data;
 }
 
 uint8_t sx1278_hw_get_dio0(sx1278_hw_t *hw)
@@ -216,19 +200,6 @@ int sx1278_LoRaEntryRx(sx1278_t *module, uint8_t length, uint32_t timeout)
     sx1278_SPIWrite(module, LR_RegPayloadLength, length); //Payload Length 21byte(this register must difine when the data long of one byte in SF is 6)
     addr = sx1278_SPIRead(module, LR_RegPayloadLength); //Read RxBaseAddr
     LOGD(TAG, "ADDR: [LR_RegPayloadLength-0x%02X:0x%02X]\r\n", LR_RegPayloadLength, addr);
-    // addr = 0;
-    // while(1)
-    // {
-    //     addr = sx1278_SPIRead(module, LR_RegFifoRxBaseAddr); //Read RxBaseAddr
-    //     LOGD(TAG, "ADDR: 0x%02X\r\n", addr);
-    //     // spi_receive_data_standard(SPI_DEVICE_1, SPI_CHIP_SELECT_NSS, &addr, 1, &temp, 1);
-    //     if(addr)
-    //     {
-    //         break;
-    //     }
-    //     // LOGE(TAG, "[ERROR %s()-%d]spi error, temp:0x%X\r\n", __func__, __LINE__, temp);
-    //     msleep(1000);
-    // }
 
     sx1278_SPIWrite(module, LR_RegFifoAddrPtr, addr); //RxBaseAddr->FiFoAddrPtr
     sx1278_SPIWrite(module, LR_RegOpMode, 0x8d);      //Mode//Low Frequency Moder
@@ -257,10 +228,9 @@ uint8_t sx1278_LoRaRxPacket(sx1278_t *module)
     unsigned char addr;
     unsigned char packet_size;
 
-    LOGD(TAG, "sx1278_LoRaRxPacket\r\n");
     if(sx1278_hw_get_dio0(module->hw))
     {
-        LOGD(TAG, "--------get dio\r\n");
+        LOGD(TAG, "sx1278_LoRaRxPacket\r\n");
         memset(module->rxBuffer, 0x00, SX1278_MAX_PACKET);
 
         addr = sx1278_SPIRead(module, LR_RegFifoRxCurrentaddr); //last packet addr
@@ -365,7 +335,7 @@ void sx1278_begin(sx1278_t *module, uint8_t frequency, uint8_t power,
         {
             break;
         }
-        LOGE(TAG, "[ERROR %s()-%d]spi error, temp:0x%X\r\n", __func__, __LINE__, temp);
+        LOGE(TAG, "[ERROR %s()-%d]SPI error, temp:0x%X\r\n", __func__, __LINE__, temp);
         msleep(1000);
     }
     LOGI(TAG, "SPI CONNECTED\r\n");

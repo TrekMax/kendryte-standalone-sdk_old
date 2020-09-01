@@ -27,11 +27,9 @@
 
 static const char *TAG = "main";
 
-// sx1278_t sx1278_module;
 sx1278_hw_t SX1278_hw;
 sx1278_t SX1278;
 
-int master;
 int ret;
 
 char buffer[64];
@@ -40,7 +38,9 @@ int message;
 int message_length;
 
 
-void lora_test(void);
+void lora_test(uint8_t master);
+#define PIN_KEY 16
+#define GPIO_KEY 0
 
 int main(void)
 {
@@ -54,24 +54,40 @@ int main(void)
     printk(LOG_COLOR_W "pll freq: %dhz\r\n", freq);
     printk(LOG_COLOR_W "-------------------------------\r\n");
 
-    lora_test();
+    fpioa_set_function(PIN_KEY, FUNC_GPIOHS0);
+    gpiohs_set_drive_mode(GPIO_KEY, GPIO_DM_INPUT_PULL_DOWN);
+    // gpiohs_set_pin_edge(GPIO_KEY, GPIO_PE_FALLING);
+
+    msleep(1500);
+    uint8_t value = gpiohs_get_pin(GPIO_KEY);
+    printf("------>   PIN_KEY[%d:%d]\r\n", GPIO_KEY, value);
+    if (value)
+    {
+        lora_test(1);
+    }
+    else
+    {
+        lora_test(0);
+    }
+
 
     printk(LOG_COLOR_W "-------------END---------------\r\n");
     return 0;
 }
-void lora_test(void)
+void lora_test(uint8_t master)
 {
-    master = 0;
     LOGI(TAG, "Lora demo");
     sx1278_begin(&SX1278, SX1278_433MHZ, SX1278_POWER_17DBM, SX1278_LORA_SF_8,
                  SX1278_LORA_BW_20_8KHZ, 10);
 
     if (master == 1)
     {
+        printf("====MASTER====\r\n");
         ret = sx1278_LoRaEntryTx(&SX1278, 16, 2000);
     }
     else
     {
+        printf("====SALAVE====\r\n");
         ret = sx1278_LoRaEntryRx(&SX1278, 16, 2000);
     }
 
@@ -83,32 +99,29 @@ void lora_test(void)
         {
             LOGD(TAG, "Master ...");
             msleep(2500);
-            LOGD(TAG, "Sending package...");
 
             message_length = sprintf(buffer, "Hello %d", message);
             ret = sx1278_LoRaEntryTx(&SX1278, message_length, 2000);
-            LOGD(TAG, "Entry: %d", ret);
+            LOGD(TAG, "Sending package[Entry: %d]...", ret);
 
             LOGI(TAG, "Sending %s", buffer);
             ret = sx1278_LoRaTxPacket(&SX1278, (uint8_t *)buffer, message_length,
                                       2000);
             message += 1;
 
-            LOGD(TAG, "Transmission: %d", ret);
-            LOGD(TAG, "Package sent...");
+            LOGD(TAG, "Package sent[Transmission: %d]...", ret);
         }
         else
         {
             LOGD(TAG, "Slave ...");
             msleep(1000);
-            LOGI(TAG, "Receiving package...");
 
             ret = sx1278_LoRaRxPacket(&SX1278);
-            LOGI(TAG, "Received: %d", ret);
+            LOGD(TAG, "Receiving package[Received: %d]...", ret);
             if (ret > 0)
             {
                 sx1278_read(&SX1278, (uint8_t *)buffer, ret);
-                LOGD(TAG, "Content (%d): %s", ret, buffer);
+                LOGI(TAG, "Content (%d): " LOG_RESET_COLOR LOG_COLOR_BROWN "\r\n%s" LOG_RESET_COLOR "\r\n", ret, buffer);
             }
             LOGD(TAG, "Package received ...");
         }
