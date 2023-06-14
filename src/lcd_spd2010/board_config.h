@@ -27,18 +27,18 @@
 // # [2|7] [20 |  8] [CS |SI ]
 // # [1|8] [GND|  6] [GND|BL ]
 
-#define SPI_IPS_LCD_CS_PIN_NUM      20
-#define SPI_IPS_LCD_SCK_PIN_NUM     21
-#define SPI_IPS_LCD_MOSI_PIN_NUM    8
+#define SPI_IPS_LCD_RST_GPIO_NUM    8
+#define SPI_IPS_LCD_DC_GPIO_NUM     9
+#define SPI_IPS_LCD_CS_PIN_NUM      10
+#define SPI_IPS_LCD_SCK_PIN_NUM     11
+#define SPI_IPS_LCD_MOSI_PIN_NUM    12
 // #define SPI_IPS_LCD_MISO_PIN_NUM    15
 
-#define SPI_IPS_LCD_DC_PIN_NUM     15
-#define SPI_IPS_LCD_BL_PIN_NUM      6
-#define SPI_IPS_LCD_RST_PIN_NUM     7
+#define SPI_IPS_LCD_RST_PIN_NUM     8
+#define SPI_IPS_LCD_DC_PIN_NUM      9
 
-#define SPI_IPS_LCD_DC_GPIO_NUM     15
+#define SPI_IPS_LCD_BL_PIN_NUM      6
 #define SPI_IPS_LCD_BL_GPIO_NUM     6
-#define SPI_IPS_LCD_RST_GPIO_NUM    7
 
 
 #define USE_HORIZONTAL 2    //设置横屏或者竖屏显示 0或1为竖屏 2或3为横屏
