@@ -11,22 +11,25 @@ static const char *TAG = "lcd";
 
 void ips_lcd_io_mux_init(void)
 {
-    fpioa_set_function(SPI_IPS_LCD_CS_PIN_NUM, FUNC_SPI1_SS0);   // CS
-    fpioa_set_function(SPI_IPS_LCD_SCK_PIN_NUM, FUNC_SPI1_SCLK); // SCLK
-    fpioa_set_function(SPI_IPS_LCD_MOSI_PIN_NUM, FUNC_SPI1_D0);  // MOSI
+    fpioa_set_function(SPI_IPS_LCD_PIN_NUM_CS, FUNC_SPI1_SS0);   // CS
+    fpioa_set_function(SPI_IPS_LCD_PIN_NUM_SCK, FUNC_SPI1_SCLK); // SCLK
+    fpioa_set_function(SPI_IPS_LCD_PIN_NUM_SIO0_SDA_MOSI, FUNC_SPI1_D0);  // MOSI
+    fpioa_set_function(SPI_IPS_LCD_PIN_NUM_SIO1, FUNC_SPI1_D1);  // MOSI
+    fpioa_set_function(SPI_IPS_LCD_PIN_NUM_SIO2, FUNC_SPI1_D2);  // MOSI
+    fpioa_set_function(SPI_IPS_LCD_PIN_NUM_SIO3, FUNC_SPI1_D3);  // MOSI
     // fpioa_set_function(SPI_IPS_LCD_MISO_PIN_NUM, FUNC_SPI1_D1);  // MISO
 
-    fpioa_set_function(SPI_IPS_LCD_DC_PIN_NUM, FUNC_GPIOHS0 + SPI_IPS_LCD_DC_GPIO_NUM);   // D2
-    fpioa_set_function(SPI_IPS_LCD_RST_PIN_NUM, FUNC_GPIOHS0 + SPI_IPS_LCD_RST_GPIO_NUM); // D3
-    fpioa_set_function(SPI_IPS_LCD_BL_PIN_NUM, FUNC_GPIOHS0 + SPI_IPS_LCD_BL_GPIO_NUM);   // D2
+    fpioa_set_function(SPI_IPS_LCD_PIN_NUM_DC, FUNC_GPIOHS0 + SPI_IPS_LCD_GPIO_NUM_DC);   // D2
+    fpioa_set_function(SPI_IPS_LCD_PIN_NUM_RST, FUNC_GPIOHS0 + SPI_IPS_LCD_GPIO_NUM_RST); // D3
+//     fpioa_set_function(SPI_IPS_LCD_BL_PIN_NUM, FUNC_GPIOHS0 + SPI_IPS_LCD_GPIO_NUM_RST);   // D2
 
-    gpiohs_set_drive_mode(SPI_IPS_LCD_DC_GPIO_NUM, GPIO_DM_OUTPUT);
-    gpiohs_set_drive_mode(SPI_IPS_LCD_RST_GPIO_NUM, GPIO_DM_OUTPUT);
-    gpiohs_set_drive_mode(SPI_IPS_LCD_BL_GPIO_NUM, GPIO_DM_OUTPUT);
+    gpiohs_set_drive_mode(SPI_IPS_LCD_GPIO_NUM_DC, GPIO_DM_OUTPUT);
+    gpiohs_set_drive_mode(SPI_IPS_LCD_GPIO_NUM_RST, GPIO_DM_OUTPUT);
+//     gpiohs_set_drive_mode(SPI_IPS_LCD_BL_GPIO_NUM, GPIO_DM_OUTPUT);
 
-    gpiohs_set_pin(SPI_IPS_LCD_DC_GPIO_NUM, GPIO_PV_HIGH);
-    gpiohs_set_pin(SPI_IPS_LCD_RST_GPIO_NUM, GPIO_PV_HIGH);
-    gpiohs_set_pin(SPI_IPS_LCD_BL_GPIO_NUM, GPIO_PV_HIGH);
+    gpiohs_set_pin(SPI_IPS_LCD_GPIO_NUM_DC, GPIO_PV_HIGH);
+    gpiohs_set_pin(SPI_IPS_LCD_GPIO_NUM_RST, GPIO_PV_HIGH);
+//     gpiohs_set_pin(SPI_IPS_LCD_BL_GPIO_NUM, GPIO_PV_HIGH);
 }
 
 static void spi_write_reg(uint8_t reg_addr, uint8_t data)
@@ -46,17 +49,17 @@ static void spi_read_reg(uint8_t reg_addr, uint8_t *reg_data)
 static void ips_lcd_write_command(uint8_t command)
 {
     uint8_t cmd[1] = {command};
-    gpiohs_set_pin(SPI_IPS_LCD_DC_GPIO_NUM, GPIO_PV_LOW);
+    gpiohs_set_pin(SPI_IPS_LCD_GPIO_NUM_DC, GPIO_PV_LOW);
 
     spi_send_data_standard(SPI_INDEX, SPI_CHIP_SELECT_NSS, cmd, 1, NULL, 0);
 
-    gpiohs_set_pin(SPI_IPS_LCD_DC_GPIO_NUM, GPIO_PV_HIGH);
+    gpiohs_set_pin(SPI_IPS_LCD_GPIO_NUM_DC, GPIO_PV_HIGH);
 }
 
 static void ips_lcd_write_data(uint8_t data)
 {
     uint8_t cmd[1] = {data};
-    gpiohs_set_pin(SPI_IPS_LCD_DC_GPIO_NUM, GPIO_PV_HIGH);
+    gpiohs_set_pin(SPI_IPS_LCD_GPIO_NUM_DC, GPIO_PV_HIGH);
 
     spi_send_data_standard(SPI_INDEX, SPI_CHIP_SELECT_NSS, cmd, 1, NULL, 0);
 }
@@ -66,7 +69,7 @@ static void ips_lcd_write_data(uint8_t data)
       入口数据：dat 写入的数据
       返回值：  无
 ******************************************************************************/
-void LCD_WR_DATA(uint16_t dat)
+void LCD_WIDTHR_DATA(uint16_t dat)
 {
     ips_lcd_write_data(dat >> 8);
     ips_lcd_write_data(dat & 0xFF);
@@ -80,43 +83,43 @@ void LCD_WR_DATA(uint16_t dat)
 ******************************************************************************/
 void LCD_Address_Set(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
 {
-    if(USE_HORIZONTAL == 0)
-    {
+//     if(USE_HORIZONTAL == 0)
+//     {
         ips_lcd_write_command(0x2a); //列地址设置
-        LCD_WR_DATA(x1 + 52);
-        LCD_WR_DATA(x2 + 52);
+        LCD_WIDTHR_DATA(x1 + 52);
+        LCD_WIDTHR_DATA(x2 + 52);
         ips_lcd_write_command(0x2b); //行地址设置
-        LCD_WR_DATA(y1 + 40);
-        LCD_WR_DATA(y2 + 40);
+        LCD_WIDTHR_DATA(y1 + 40);
+        LCD_WIDTHR_DATA(y2 + 40);
         ips_lcd_write_command(0x2c); //储存器写
-    } else if(USE_HORIZONTAL == 1)
-    {
-        ips_lcd_write_command(0x2a); //列地址设置
-        LCD_WR_DATA(x1 + 53);
-        LCD_WR_DATA(x2 + 53);
-        ips_lcd_write_command(0x2b); //行地址设置
-        LCD_WR_DATA(y1 + 40);
-        LCD_WR_DATA(y2 + 40);
-        ips_lcd_write_command(0x2c); //储存器写
-    } else if(USE_HORIZONTAL == 2)
-    {
-        ips_lcd_write_command(0x2a); //列地址设置
-        LCD_WR_DATA(x1 + 40);
-        LCD_WR_DATA(x2 + 40);
-        ips_lcd_write_command(0x2b); //行地址设置
-        LCD_WR_DATA(y1 + 53);
-        LCD_WR_DATA(y2 + 53);
-        ips_lcd_write_command(0x2c); //储存器写
-    } else
-    {
-        ips_lcd_write_command(0x2a); //列地址设置
-        LCD_WR_DATA(x1 + 40);
-        LCD_WR_DATA(x2 + 40);
-        ips_lcd_write_command(0x2b); //行地址设置
-        LCD_WR_DATA(y1 + 52);
-        LCD_WR_DATA(y2 + 52);
-        ips_lcd_write_command(0x2c); //储存器写
-    }
+//     } else if(USE_HORIZONTAL == 1)
+//     {
+//         ips_lcd_write_command(0x2a); //列地址设置
+//         LCD_WIDTHR_DATA(x1 + 53);
+//         LCD_WIDTHR_DATA(x2 + 53);
+//         ips_lcd_write_command(0x2b); //行地址设置
+//         LCD_WIDTHR_DATA(y1 + 40);
+//         LCD_WIDTHR_DATA(y2 + 40);
+//         ips_lcd_write_command(0x2c); //储存器写
+//     } else if(USE_HORIZONTAL == 2)
+//     {
+//         ips_lcd_write_command(0x2a); //列地址设置
+//         LCD_WIDTHR_DATA(x1 + 40);
+//         LCD_WIDTHR_DATA(x2 + 40);
+//         ips_lcd_write_command(0x2b); //行地址设置
+//         LCD_WIDTHR_DATA(y1 + 53);
+//         LCD_WIDTHR_DATA(y2 + 53);
+//         ips_lcd_write_command(0x2c); //储存器写
+//     } else
+//     {
+//         ips_lcd_write_command(0x2a); //列地址设置
+//         LCD_WIDTHR_DATA(x1 + 40);
+//         LCD_WIDTHR_DATA(x2 + 40);
+//         ips_lcd_write_command(0x2b); //行地址设置
+//         LCD_WIDTHR_DATA(y1 + 52);
+//         LCD_WIDTHR_DATA(y2 + 52);
+//         ips_lcd_write_command(0x2c); //储存器写
+//     }
 }
 /******************************************************************************
       函数说明：在指定位置画点
@@ -127,7 +130,7 @@ void LCD_Address_Set(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
 void LCD_DrawPoint(uint16_t x, uint16_t y, uint16_t color)
 {
     LCD_Address_Set(x, y, x, y); //设置光标位置
-    LCD_WR_DATA(color);
+    LCD_WIDTHR_DATA(color);
 }
 
 /******************************************************************************
@@ -226,17 +229,17 @@ void LCD_ShowPicture(uint16_t x, uint16_t y, uint16_t length, uint16_t width, co
 ******************************************************************************/
 void LCD_Fill(uint16_t x, uint16_t y, uint16_t length, uint16_t width, uint16_t color)
 {
-    gpiohs_set_pin(SPI_IPS_LCD_DC_GPIO_NUM, GPIO_PV_HIGH);
+    gpiohs_set_pin(SPI_IPS_LCD_GPIO_NUM_DC, GPIO_PV_HIGH);
     uint16_t num;
     num = length * width * 2;
     uint32_t data = ((uint32_t)color << 16) | (uint32_t)color;
     LCD_Address_Set(x, y, x + length - 1, y + width - 1);
 
-    spi_init(SPI_INDEX, SPI_WORK_MODE_0, SPI_FF_STANDARD, 32, 0);
+    spi_init(SPI_INDEX, SPI_WORK_MODE_0, SPI_FF_QUAD, 32, 0);
     spi_init_non_standard(SPI_INDEX, 0 /*instrction length*/, 32 /*address length*/, 0 /*wait cycles*/,
                           SPI_AITM_AS_FRAME_FORMAT /*spi address trans mode*/);
     spi_fill_data_dma(DMAC_CHANNEL0, SPI_INDEX, SPI_CHIP_SELECT_NSS, &data, num / 2);
-    spi_init(SPI_INDEX, SPI_WORK_MODE_0, SPI_FF_STANDARD, DATALENGTH, 0);
+    spi_init(SPI_INDEX, SPI_WORK_MODE_0, SPI_FF_QUAD, DATALENGTH, 0);
 }
 /******************************************************/
 
@@ -606,14 +609,15 @@ static int spd2010_exit_sleep()
 	return spd2010_transmit(SPD2010_SLPOUT, NULL, 0);
 }
 
-void ips_lcd_init(void)
+int ips_lcd_init(void)
 {
+    int ret = 0;
     ips_lcd_io_mux_init();
-    spi_init(SPI_INDEX, SPI_WORK_MODE_0, SPI_FF_STANDARD, DATALENGTH, 0);
+    spi_init(SPI_INDEX, SPI_WORK_MODE_0, SPI_FF_QUAD, DATALENGTH, 0);
 
-    gpiohs_set_pin(SPI_IPS_LCD_RST_GPIO_NUM, GPIO_PV_LOW);
+    gpiohs_set_pin(SPI_IPS_LCD_GPIO_NUM_RST, GPIO_PV_LOW);
     msleep(100);
-    gpiohs_set_pin(SPI_IPS_LCD_RST_GPIO_NUM, GPIO_PV_HIGH);
+    gpiohs_set_pin(SPI_IPS_LCD_GPIO_NUM_RST, GPIO_PV_HIGH);
     msleep(100);
 	uint16_t i;
     
@@ -625,19 +629,20 @@ void ips_lcd_init(void)
 		}
 	}
     spd2010_exit_sleep();
-    gpiohs_set_pin(SPI_IPS_LCD_BL_GPIO_NUM, GPIO_PV_LOW);
-    LCD_Fill(0, 0, LCD_W, LCD_H, BLACK);
+//     gpiohs_set_pin(SPI_IPS_LCD_BL_GPIO_NUM, GPIO_PV_LOW);
+    LCD_Fill(0, 0, LCD_WIDTH, LCD_HIGH, BLACK);
+    return ret;
 }
 
 void ips_lcd_color_bar_test(void)
 {
-    uint8_t color_bar_w = LCD_W / 8;
-    LCD_Fill(color_bar_w * 0, 0, color_bar_w, LCD_H, WHITE);
-    LCD_Fill(color_bar_w * 1, 0, color_bar_w, LCD_H, YELLOW);
-    LCD_Fill(color_bar_w * 2, 0, color_bar_w, LCD_H, GBLUE);
-    LCD_Fill(color_bar_w * 3, 0, color_bar_w, LCD_H, GREEN);
-    LCD_Fill(color_bar_w * 4, 0, color_bar_w, LCD_H, CYAN);
-    LCD_Fill(color_bar_w * 5, 0, color_bar_w, LCD_H, RED);
-    LCD_Fill(color_bar_w * 6, 0, color_bar_w, LCD_H, BLUE);
-    LCD_Fill(color_bar_w * 7, 0, color_bar_w, LCD_H, BLACK);
+    uint8_t color_bar_w = LCD_WIDTH / 8;
+    LCD_Fill(color_bar_w * 0, 0, color_bar_w, LCD_HIGH, WHITE);
+    LCD_Fill(color_bar_w * 1, 0, color_bar_w, LCD_HIGH, YELLOW);
+    LCD_Fill(color_bar_w * 2, 0, color_bar_w, LCD_HIGH, GBLUE);
+    LCD_Fill(color_bar_w * 3, 0, color_bar_w, LCD_HIGH, GREEN);
+    LCD_Fill(color_bar_w * 4, 0, color_bar_w, LCD_HIGH, CYAN);
+    LCD_Fill(color_bar_w * 5, 0, color_bar_w, LCD_HIGH, RED);
+    LCD_Fill(color_bar_w * 6, 0, color_bar_w, LCD_HIGH, BLUE);
+    LCD_Fill(color_bar_w * 7, 0, color_bar_w, LCD_HIGH, BLACK);
 }

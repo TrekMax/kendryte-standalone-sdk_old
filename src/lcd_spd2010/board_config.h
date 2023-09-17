@@ -3,55 +3,39 @@
 
 #define CONFIG_LOG_COLORS 1
 
-#define BOARD_MAIX_DOCK     1
-#define BOARD_MAIX_DUINO    2
-#define BOARD_MAIX_GO       3
-#define BOARD_MAIX_BIT      4
-
 #define BOARD_MAIX_M1N      5
-#define BOARD_MAIX_CUBE     6
-#define BOARD_MAIX_NEW_GO   7
-
-
 #define BOARD BOARD_MAIX_M1N
 #define BOARD_NAME  "BOARD_MAIX_M1N"
 
-#if ((BOARD == BOARD_MAIX_CUBE) || (BOARD == BOARD_MAIX_M1N))
+#define SPI_INDEX                       1
+#define SPI_CLK_RATE                    600*1000
+#define SPI_CHIP_SELECT_NSS             0//SPI_CHIP_SELECT_0
 
-#define SPI_INDEX           1
-#define SPI_SCLK_RATE       600*1000
-#define SPI_CHIP_SELECT_NSS 0//SPI_CHIP_SELECT_0
-// SPMOD Interface
-// # [4|5] [7  |VCC] [RST|3V3]
-// # [3|6] [15 | 21] [D/C|SCK]
-// # [2|7] [20 |  8] [CS |SI ]
-// # [1|8] [GND|  6] [GND|BL ]
+// 356(H)RGB x400(V)
+#define LCD_WIDTH                       (356)
+#define LCD_HIGH                        (400)
 
-#define SPI_IPS_LCD_RST_GPIO_NUM    8
-#define SPI_IPS_LCD_DC_GPIO_NUM     9
-#define SPI_IPS_LCD_CS_PIN_NUM      10
-#define SPI_IPS_LCD_SCK_PIN_NUM     11
-#define SPI_IPS_LCD_MOSI_PIN_NUM    12
-// #define SPI_IPS_LCD_MISO_PIN_NUM    15
+// PIN 定义，使用 QSPI 接口
+#define SPI_IPS_LCD_PIN_NUM_RST                 0
+#define SPI_IPS_LCD_PIN_NUM_CS                  1
+#define SPI_IPS_LCD_PIN_NUM_SCK                 2
+#define SPI_IPS_LCD_PIN_NUM_SIO1                3
+#define SPI_IPS_LCD_PIN_NUM_SIO0_SDA_MOSI       4
+#define SPI_IPS_LCD_PIN_NUM_SIO3                5
+#define SPI_IPS_LCD_PIN_NUM_SIO2                6
+#define SPI_IPS_LCD_PIN_NUM_DC                  7
 
-#define SPI_IPS_LCD_RST_PIN_NUM     8
-#define SPI_IPS_LCD_DC_PIN_NUM      9
-
-#define SPI_IPS_LCD_BL_PIN_NUM      6
-#define SPI_IPS_LCD_BL_GPIO_NUM     6
-
-
-#define USE_HORIZONTAL 2    //设置横屏或者竖屏显示 0或1为竖屏 2或3为横屏
+#define SPI_IPS_LCD_GPIO_NUM_RST                 0
+#define SPI_IPS_LCD_GPIO_NUM_CS                  1
+#define SPI_IPS_LCD_GPIO_NUM_SCK                 2
+#define SPI_IPS_LCD_GPIO_NUM_SIO1                3
+#define SPI_IPS_LCD_GPIO_NUM_SIO0_SDA_MOSI       4
+#define SPI_IPS_LCD_GPIO_NUM_SIO3                5
+#define SPI_IPS_LCD_GPIO_NUM_SIO2                6
+#define SPI_IPS_LCD_GPIO_NUM_DC                  7
 
 
-#if USE_HORIZONTAL==0||USE_HORIZONTAL==1
-#define LCD_W 135
-#define LCD_H 240
 
-#else
-#define LCD_W 240
-#define LCD_H 135
-#endif
 
 
 //画笔颜色
@@ -76,13 +60,5 @@
 #define LGRAY 0XC618      //浅灰色(PANNEL),窗体背景色
 #define LGRAYBLUE 0XA651  //浅灰蓝色(中间层颜色)
 #define LBBLUE 0X2B12     //浅棕蓝色(选择条目的反色)
-
-
-
-#elif (BOARD == BOARD_MAIX_NEW_GO)
-
-#else
-
-#endif
 
 #endif
