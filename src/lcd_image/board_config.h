@@ -11,11 +11,14 @@
 #define BOARD_MAIX_NEW_GO       6
 #define BOARD_MAIX_AMIGO_IPS    7
 
-#define BOARD   BOARD_MAIX_AMIGO_IPS
-#define BOARD_NAME "BOARD_MAIX_AMIGO_IPS"
+#define BOARD   BOARD_MAIX_GO
+#define BOARD_NAME "BOARD_MAIX_GO"
 
-#if ((BOARD == BOARD_MAIX_DUINO) || (BOARD == BOARD_MAIX_NEW_GO) || (BOARD == BOARD_MAIX_CUBE)|| (BOARD == BOARD_MAIX_AMIGO_IPS))
-
+#if ((BOARD == BOARD_MAIX_DUINO) \
+    || (BOARD == BOARD_MAIX_NEW_GO) \
+    || (BOARD == BOARD_MAIX_CUBE) \
+    || (BOARD == BOARD_MAIX_AMIGO_IPS) \
+    || (BOARD == BOARD_MAIX_GO))
 #define DCX_GPIO_HS_NUM        (2)
 #define RST_GPIO_HS_NUM        (30)
 
@@ -27,7 +30,7 @@
 #define SPI_CHANNEL             0
 #define SPI_SLAVE_SELECT        3
 
-#elif (BOARD == BOARD_MAIX_GO)
+
 
 #else
 
@@ -62,7 +65,8 @@
 
 
 #else
-
+#define LCD_X_MAX   (320)
+#define LCD_Y_MAX   (480)
 #endif
 
 #endif
